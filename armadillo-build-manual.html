@@ -1,0 +1,2414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velove Armadillo Supercycle — Build Manual v3</title>
+<style>
+:root{--blk:#1a1a1a;--gray:#f5f5f5;--mid:#e0e0e0;--warn-bg:#fff8e1;--warn-br:#f9a825;--tip-bg:#e8f5e9;--tip-br:#2e7d32;--dan-bg:#ffebee;--dan-br:#c62828;--inf-bg:#e3f2fd;--inf-br:#1565c0;--grn:#2e7d32;--red:#c62828;--blu:#1565c0;--orn:#e65100}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Helvetica Neue',Arial,sans-serif;color:var(--blk);background:#fff;font-size:15px;line-height:1.65}
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;width:236px;height:100vh;background:#111;overflow-y:auto;z-index:100;scrollbar-width:thin}
+nav .logo{padding:16px 16px 12px;border-bottom:1px solid #252525}
+nav .logo strong{display:block;font-size:13.5px;color:#fff;letter-spacing:.3px}
+nav .logo span{font-size:10px;color:#666;letter-spacing:1.5px;text-transform:uppercase}
+nav .grp{padding:9px 16px 3px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#444;margin-top:4px}
+nav ul{list-style:none}
+nav ul li a{display:block;padding:7px 16px;color:#888;text-decoration:none;font-size:12.5px;border-left:3px solid transparent;transition:all .15s}
+nav ul li a:hover,nav ul li a.active{background:#1e1e1e;color:#fff;border-left-color:#fff}
+nav ul li.phase a{color:#ccc;font-weight:600}
+/* ── LAYOUT ── */
+main{margin-left:236px}
+/* ── COVER ── */
+.cover{background:var(--blk);color:#fff;padding:70px 60px;min-height:100vh;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
+.cover::after{content:'';position:absolute;right:-80px;top:-80px;width:460px;height:460px;border:100px solid #1e1e1e;border-radius:50%;pointer-events:none}
+.cover .tag{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#555;margin-bottom:12px}
+.cover h1{font-size:50px;font-weight:900;line-height:1.05;margin-bottom:8px;position:relative;z-index:1}
+.cover h1 em{display:block;font-style:normal;font-size:22px;font-weight:300;color:#888;margin-top:6px}
+.stats{display:flex;flex-wrap:wrap;gap:28px;margin-top:36px;padding-top:28px;border-top:1px solid #252525}
+.stat strong{display:block;font-size:26px;font-weight:900}
+.stat span{font-size:11px;color:#555;text-transform:uppercase;letter-spacing:.5px}
+.cover-img{margin-top:36px;background:#111;border-radius:10px;padding:18px;max-width:660px;border:1px solid #222}
+.cover-img img{width:100%;height:auto;display:block}
+.cover-img figcaption{font-size:11px;color:#444;text-align:center;margin-top:6px}
+/* ── PAGE SECTIONS ── */
+.pg{padding:52px 60px;border-bottom:2px solid var(--mid)}
+.pg:last-child{border-bottom:none}
+.lbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#999;margin-bottom:5px}
+.ttl{font-size:28px;font-weight:900;margin-bottom:6px}
+.sub{font-size:14px;color:#666;margin-bottom:24px;max-width:680px;line-height:1.6}
+hr.div{border:none;border-top:2px solid var(--mid);margin:32px 0}
+/* ── ALERTS ── */
+.warn,.tip,.danger,.info,.note{padding:12px 16px;border-radius:0 6px 6px 0;margin:12px 0;font-size:13.5px;line-height:1.6}
+.warn{background:var(--warn-bg);border-left:4px solid var(--warn-br)}
+.tip{background:var(--tip-bg);border-left:4px solid var(--tip-br)}
+.danger{background:var(--dan-bg);border-left:4px solid var(--dan-br)}
+.info{background:var(--inf-bg);border-left:4px solid var(--inf-br)}
+.note{background:#f3e5f5;border-left:4px solid #7b1fa2}
+.warn::before{content:"⚠️  "}.tip::before{content:"💡  "}.danger::before{content:"🛑  "}.info::before{content:"ℹ️  "}.note::before{content:"📝  "}
+/* ── COMPONENT GRID ── */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px;margin-top:22px}
+.ccard{border:2px solid var(--mid);border-radius:8px;overflow:hidden;transition:box-shadow .2s}
+.ccard:hover{box-shadow:0 4px 16px rgba(0,0,0,.1)}
+.cimg{background:var(--gray);padding:18px;display:flex;align-items:center;justify-content:center;min-height:120px}
+.cbody{padding:13px 15px}
+.ccode{font-family:monospace;font-size:10px;background:var(--mid);padding:2px 7px;border-radius:10px;color:#666;margin-bottom:5px;display:inline-block}
+.ccard h4{font-size:14px;font-weight:800;margin-bottom:4px}
+.ccard p{font-size:12px;color:#666;line-height:1.5}
+.cqty{font-size:11px;color:#999;margin-top:5px;font-weight:600}
+/* ── TOOLS ── */
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:14px;margin-top:20px}
+.tcard{border:2px solid var(--blk);border-radius:8px;padding:18px 14px;text-align:center}
+.tcard svg{display:block;margin:0 auto 8px}
+.tcard h4{font-size:13px;font-weight:800;margin-bottom:3px}
+.tcard p{font-size:11px;color:#777;line-height:1.4}
+/* ── TORQUE TABLE ── */
+.tq{width:100%;border-collapse:collapse;font-size:13px;margin:14px 0}
+.tq th{background:var(--blk);color:#fff;padding:9px 13px;font-size:11px;letter-spacing:.5px;text-transform:uppercase;text-align:left}
+.tq td{padding:8px 13px;border-bottom:1px solid var(--mid)}
+.tq tr:nth-child(even) td{background:var(--gray)}
+.tqv{font-weight:800;font-size:14px;color:var(--red)}
+/* ── PHASE BANNER ── */
+.phase{background:var(--blk);color:#fff;padding:34px 60px;display:flex;align-items:center;gap:24px}
+.pnum{font-size:76px;font-weight:900;opacity:.1;line-height:1;flex-shrink:0}
+.pinfo h2{font-size:26px;font-weight:900}
+.pinfo .psub{font-size:13px;color:#777;margin-top:3px}
+.pbadges{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
+.badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:700}
+.bt{background:#252525;color:#ccc}
+.br{background:#3b0f0f;color:#ff8a80}
+.bm{background:#0f2b0f;color:#a5d6a7}
+/* ── STEP ── */
+.step{display:grid;grid-template-columns:60px 1fr;margin:30px 0}
+.snum{width:46px;height:46px;background:var(--blk);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;flex-shrink:0;margin-top:2px}
+.sbody{padding-left:18px}
+.sbody h3{font-size:16.5px;font-weight:900;margin-bottom:9px}
+.swhy{font-size:12.5px;color:#777;font-style:italic;margin-bottom:10px;padding:7px 12px;background:var(--gray);border-radius:4px;border-left:3px solid var(--mid)}
+/* ── PARTS BOX ── */
+.pbox{background:var(--gray);border-left:4px solid var(--blk);padding:11px 15px;margin-bottom:12px;border-radius:0 6px 6px 0}
+.pbox .pl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#888;margin-bottom:7px}
+.pbox ul{list-style:none;display:flex;flex-wrap:wrap;gap:6px}
+.pbox li{background:#fff;border:1px solid var(--mid);padding:4px 10px;border-radius:20px;font-size:12.5px}
+.pbox li code{font-size:10px;color:#aaa;margin-left:3px}
+/* ── ASSEMBLY ORDER ── */
+.asm{display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin:13px 0;padding:11px 15px;background:#fffde7;border:2px solid #f9a825;border-radius:6px;font-size:13px}
+.ai{background:#f9a825;color:#000;padding:3px 10px;border-radius:4px;font-weight:700;font-size:12px;white-space:nowrap}
+.aa{color:#f9a825;font-weight:900;font-size:16px;line-height:1}
+/* ── DIAGRAM BOX ── */
+.dbox{margin:16px 0;background:var(--gray);border:2px solid var(--mid);border-radius:8px;padding:18px;text-align:center}
+.dbox img{max-width:100%;height:auto;display:block;margin:0 auto}
+.dbox figcaption{font-size:11.5px;color:#888;margin-top:7px}
+/* ── ILLUSTRATION STRIP ── */
+.istrip{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0;align-items:flex-start}
+.iitem{text-align:center;min-width:90px;max-width:125px}
+.iitem svg{display:block;margin:0 auto 5px}
+.iitem p{font-size:11px;color:#555;line-height:1.3}
+/* ── INSTRUCTIONS ── */
+.inst ol{margin:7px 0 7px 20px}
+.inst ol li{margin-bottom:8px;font-size:14px;line-height:1.65}
+.inst ol li strong{font-weight:800}
+/* ── MISTAKE / CHECK ── */
+.mistake{background:#fff3e0;border:2px dashed #e65100;border-radius:6px;padding:11px 15px;margin:11px 0;font-size:13px}
+.mistake::before{content:"❌  Common mistake: ";font-weight:800;color:#e65100}
+.chklist{list-style:none;margin:12px 0}
+.chklist li{padding:8px 0;border-bottom:1px solid var(--mid);display:flex;align-items:flex-start;gap:10px;font-size:13.5px}
+.chklist li::before{content:"☐";font-size:22px;color:#ccc;flex-shrink:0;line-height:1.1}
+/* ── WIRING ── */
+.wtable{border-collapse:collapse;font-size:13px;margin:14px 0;width:100%}
+.wtable th{background:var(--blk);color:#fff;padding:8px 13px;text-align:left}
+.wtable td{padding:8px 13px;border-bottom:1px solid var(--mid)}
+.wdot{display:inline-block;width:14px;height:14px;border-radius:50%;margin-right:6px;vertical-align:middle;border:1px solid rgba(0,0,0,.15)}
+/* ── PARTS TABLE ── */
+.ptbl{width:100%;border-collapse:collapse;font-size:13px;margin-top:16px}
+.ptbl th{background:var(--blk);color:#fff;padding:9px 13px;font-size:11px;letter-spacing:.5px;text-transform:uppercase;text-align:left}
+.ptbl td{padding:8px 13px;border-bottom:1px solid var(--mid)}
+.ptbl tr:nth-child(even) td{background:var(--gray)}
+.pcode{font-family:monospace;background:var(--mid);padding:2px 6px;border-radius:10px;font-size:11px}
+/* ── SPECIAL ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:16px 0}
+.box-blk{background:var(--blk);color:#fff;border-radius:8px;padding:20px}
+.box-blk h4{font-size:14px;font-weight:800;margin-bottom:8px}
+.box-blk p,.box-blk li{font-size:13px;color:#bbb;line-height:1.6}
+.box-blk ul{margin-left:18px}
+.lrguide{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
+.lrbox{padding:16px;border-radius:8px;text-align:center}
+.lrbox h4{font-size:16px;font-weight:900;margin-bottom:8px}
+.lrbox p{font-size:12.5px;line-height:1.5}
+.lrbox.left{background:#e3f2fd;border:2px solid #1565c0}
+.lrbox.right{background:#fce4ec;border:2px solid #c62828}
+/* ── MAINTENANCE ── */
+.mtable{width:100%;border-collapse:collapse;font-size:13px;margin:14px 0}
+.mtable th{background:var(--blk);color:#fff;padding:9px 13px;font-size:11px;letter-spacing:.5px;text-transform:uppercase;text-align:left}
+.mtable td{padding:8px 13px;border-bottom:1px solid var(--mid);vertical-align:top}
+.mtable tr:nth-child(even) td{background:var(--gray)}
+/* ── TROUBLESHOOT ── */
+.tshoot{border:2px solid var(--mid);border-radius:8px;overflow:hidden;margin-bottom:14px}
+.tshoot .ts-q{background:var(--blk);color:#fff;padding:12px 16px;font-weight:700;font-size:14px;cursor:pointer}
+.tshoot .ts-a{padding:14px 16px;font-size:13.5px;line-height:1.7}
+.tshoot .ts-a ol{margin-left:20px;margin-top:8px}
+.tshoot .ts-a ol li{margin-bottom:6px}
+/* ── PRINT ── */
+@media print{nav{display:none}main{margin-left:0}.phase{break-before:page}}
+@media(max-width:860px){nav{display:none}main{margin-left:0}.cover,.pg{padding:32px 20px}.phase{padding:24px 20px}.cover h1{font-size:32px}.two-col,.lrguide{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo"><strong>Armadillo Supercycle</strong><span>Build Manual v3</span></div>
+  <div class="grp">Before You Start</div>
+  <ul>
+    <li><a href="#cover">Cover</a></li>
+    <li><a href="#howtoread">How to Use This Manual</a></li>
+    <li><a href="#lrguide">Left / Right Guide</a></li>
+    <li><a href="#components">Know Your Parts</a></li>
+    <li><a href="#tools">Tools Required</a></li>
+    <li><a href="#torque">Torque Reference</a></li>
+    <li><a href="#fasteners">Fastener Guide</a></li>
+    <li><a href="#parts">Full Parts List</a></li>
+  </ul>
+  <div class="grp">Build Phases</div>
+  <ul>
+    <li class="phase"><a href="#phase1">① Verify &amp; Clean</a></li>
+    <li class="phase"><a href="#phase2">② Pre-Assembly</a></li>
+    <li class="phase"><a href="#phase3">③ Kingpins &amp; Steering</a></li>
+    <li class="phase"><a href="#phase4">④ Suspension &amp; Motor</a></li>
+    <li class="phase"><a href="#phase5">⑤ Brakes &amp; Wheels</a></li>
+    <li class="phase"><a href="#phase6">⑥ Chain, Battery &amp; Finish</a></li>
+  </ul>
+  <div class="grp">Reference</div>
+  <ul>
+    <li><a href="#wiring">Wiring Guide</a></li>
+    <li><a href="#rohloff">Rohloff Setup</a></li>
+    <li><a href="#brakebleed">Brake Bleeding</a></li>
+    <li><a href="#troubleshoot">Troubleshooting</a></li>
+    <li><a href="#maintenance">Maintenance</a></li>
+    <li><a href="#checklist">Final Checklist</a></li>
+  </ul>
+</nav>
+<main>
+
+<!-- ═══ COVER ═══ -->
+<section id="cover" class="cover" style="border:none">
+  <div class="tag">Velove · Supercycle Series</div>
+  <h1>Armadillo Build Manual<em>Complete DIY Assembly Guide — Beginner Friendly · v3</em></h1>
+  <div class="stats">
+    <div class="stat"><strong>6</strong><span>Build Phases</span></div>
+    <div class="stat"><strong>~40h</strong><span>Total Build</span></div>
+    <div class="stat"><strong>4 ×</strong><span>Wheels</span></div>
+    <div class="stat"><strong>Bafang</strong><span>Mid-Drive Motor</span></div>
+    <div class="stat"><strong>Rohloff</strong><span>14-Speed Hub</span></div>
+    <div class="stat"><strong>250 W</strong><span>Electric Assist</span></div>
+  </div>
+  <div class="cover-img">
+    <img src="Instructions%20Supercycle/planarmadillo/Velove%20Armadillo%20Overview%20sv.svg" alt="Armadillo Overview" onerror="this.style.display='none'">
+    <figcaption>Velove Armadillo Supercycle — full assembly overview</figcaption>
+  </div>
+  <div class="info" style="max-width:660px;margin-top:24px">
+    <strong>New to building?</strong> Read <a href="#howtoread" style="color:var(--blu);font-weight:700">How to Use This Manual</a> and <a href="#components" style="color:var(--blu);font-weight:700">Know Your Parts</a> before touching any tools. Every component is labelled with a diagram and plain-English description.
+  </div>
+</section>
+
+<!-- ═══ HOW TO USE ═══ -->
+<section id="howtoread" class="pg">
+  <div class="lbl">Read first</div>
+  <div class="ttl">How to Use This Manual</div>
+  <div class="sub">Every page element explained. Understand the symbols before building.</div>
+
+  <div class="two-col">
+    <div>
+      <h3 style="font-size:16px;font-weight:800;margin-bottom:12px">Page Symbols</h3>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px;background:var(--warn-bg);border-radius:6px;border-left:4px solid var(--warn-br)">
+          <span style="font-size:20px;flex-shrink:0">⚠️</span>
+          <div><strong>Warning</strong> — risk of damage or poor result if ignored. Read before starting the step.</div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px;background:var(--dan-bg);border-radius:6px;border-left:4px solid var(--dan-br)">
+          <span style="font-size:20px;flex-shrink:0">🛑</span>
+          <div><strong>Safety Stop</strong> — must not be skipped. Affects rider safety.</div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px;background:var(--tip-bg);border-radius:6px;border-left:4px solid var(--tip-br)">
+          <span style="font-size:20px;flex-shrink:0">💡</span>
+          <div><strong>Tip</strong> — helpful trick that makes the step easier or faster.</div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px;background:var(--inf-bg);border-radius:6px;border-left:4px solid var(--inf-br)">
+          <span style="font-size:20px;flex-shrink:0">ℹ️</span>
+          <div><strong>Info</strong> — background context to understand why a step matters.</div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px;background:#fff3e0;border-radius:6px;border:2px dashed #e65100">
+          <span style="font-size:20px;flex-shrink:0">❌</span>
+          <div><strong>Common Mistake</strong> — what most beginners get wrong here, and how to avoid it.</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h3 style="font-size:16px;font-weight:800;margin-bottom:12px">Loctite Colour Guide</h3>
+      <div style="margin-bottom:12px;padding:14px;background:#fff;border:2px solid var(--mid);border-radius:8px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="width:28px;height:28px;border-radius:50%;background:#b71c1c;flex-shrink:0"></div>
+          <div><strong>Loctite 222 — Red/Purple (Weak)</strong><br><span style="font-size:12px;color:#666">Brake adapters, small bolts, light-duty fasteners. Removable by hand tools. Cure: 30 min working, 24h full.</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:28px;height:28px;border-radius:50%;background:#1565c0;flex-shrink:0"></div>
+          <div><strong>Loctite 243 — Blue (Medium)</strong><br><span style="font-size:12px;color:#666">Seat rails, frame bolts, general purpose. Removable with standard tools + heat. Cure: 30 min working, 24h full.</span></div>
+        </div>
+      </div>
+      <div style="padding:14px;background:var(--gray);border-radius:8px">
+        <strong style="font-size:13px">When is Loctite "cured"?</strong>
+        <p style="font-size:12.5px;color:#666;margin-top:6px;line-height:1.5">After 30 min: the Loctite has set enough that the bolt won't vibrate loose immediately. After 24h at room temperature (20°C): fully cured — maximum strength. <strong>Do not stress Loctite-fastened joints within 30 min of application.</strong></p>
+      </div>
+      <div style="margin-top:12px;padding:14px;background:var(--gray);border-radius:8px">
+        <strong style="font-size:13px">Assembly Order reminder</strong>
+        <div class="asm" style="margin-top:8px">
+          <span class="ai">BOLT</span><span class="aa">→</span><span class="ai">WASHER</span><span class="aa">→</span><span class="ai">BUSH</span><span class="aa">→</span><span class="ai">PART</span><span class="aa">→</span><span class="ai">BUSH</span><span class="aa">→</span><span class="ai">WASHER</span><span class="aa">→</span><span class="ai">NUT</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="div">
+  <h3 style="font-size:18px;font-weight:800;margin-bottom:16px">The Two-Wrench Technique</h3>
+  <div class="info">Most bolts in this build require holding the bolt still while turning the nut — if you only use one spanner the bolt will just spin. This is the fundamental technique for tightening suspension joints.</div>
+  <div class="istrip" style="justify-content:center;gap:24px">
+    <div class="iitem" style="max-width:200px">
+      <svg width="180" height="100" viewBox="0 0 180 100">
+        <!-- bolt head left -->
+        <rect x="10" y="38" width="30" height="24" rx="4" fill="#555"/>
+        <polygon points="18,43 22,42 22,52 18,51" fill="#888"/>
+        <!-- bolt shaft -->
+        <rect x="40" y="45" width="100" height="10" fill="none" stroke="#1a1a1a" stroke-width="2"/>
+        <!-- nut right -->
+        <polygon points="140,36 156,40 160,50 156,60 140,64 130,50" fill="#555"/>
+        <!-- left spanner -->
+        <path d="M5,55 Q0,45 5,35 L20,35 Q18,45 20,55 Z" fill="none" stroke="#1565c0" stroke-width="3" stroke-linejoin="round"/>
+        <!-- right spanner -->
+        <path d="M175,55 Q180,45 175,35 L160,35 Q162,45 160,55 Z" fill="none" stroke="#c62828" stroke-width="3" stroke-linejoin="round"/>
+        <!-- arrows -->
+        <path d="M5,30 Q0,15 12,12" stroke="#1565c0" stroke-width="2" fill="none" marker-end="url(#arb)"/>
+        <path d="M175,30 Q180,15 168,12" stroke="#c62828" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+        <text x="8" y="10" font-size="9" fill="#1565c0">HOLD STILL</text>
+        <text x="140" y="10" font-size="9" fill="#c62828" text-anchor="end">TURN CLOCKWISE</text>
+      </svg>
+      <p style="max-width:180px"><strong>Blue spanner:</strong> holds bolt head still. <strong>Red spanner:</strong> tightens the nut clockwise. Both hands needed.</p>
+    </div>
+  </div>
+
+  <hr class="div">
+  <h3 style="font-size:18px;font-weight:800;margin-bottom:16px">Glossary of Key Terms</h3>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-top:12px">
+    <div style="border:1px solid var(--mid);border-radius:6px;padding:11px 14px"><strong style="font-size:14px;display:block;margin-bottom:3px">Kingpin</strong><p style="font-size:12.5px;color:#555">The vertical spindle each wheel pivots around — like a car's steering knuckle. Upper and lower wishbones connect to it.</p></div>
+    <div style="border:1px solid var(--mid);border-radius:6px;padding:11px 14px"><strong style="font-size:14px;display:block;margin-bottom:3px">Wishbone</strong><p style="font-size:12.5px;color:#555">A-shaped suspension arm connecting frame to kingpin. 8 total: 1 upper + 1 lower per corner.</p></div>
+    <div style="border:1px solid var(--mid);border-radius:6px;padding:11px 14px"><strong style="font-size:14px;display:block;margin-bottom:3px">Rod End</strong><p style="font-size:12.5px;color:#555">Threaded shaft with a ball-and-socket joint. LEFT thread = tightens counter-clockwise. RIGHT thread = tightens clockwise (normal).</p></div>
+    <div style="border:1px solid var(--mid);border-radius:6px;padding:11px 14px"><strong style="font-size:14px;display:block;margin-bottom:3px">Bellow</strong><p style="font-size:12.5px;color:#555">Rubber boot sealing grease inside a rod end. Insert rod end through the SIDE SLIT, not the end hole.</p></div>
+    <div style="border:1px solid var(--mid);border-radius:6px;padding:11px 14px"><strong style="font-size:14px;display:block;margin-bottom:3px">Distance Bush</strong><p style="font-size:12.5px;color:#555">Hollow metal spacer cylinder on a bolt. Prevents over-clamping and ensures the rod end ball can still move freely after tightening.</p></div>
+    <div style="border:1px solid var(--mid);border-radius:6px;padding:11px 14px"><strong style="font-size:14px;display:block;margin-bottom:3px">Nylon Stop Nut</strong><p style="font-size:12.5px;color:#555">Self-locking nut with a nylon insert that grips the thread. Do NOT reuse — the nylon deforms on first use.</p></div>
+    <div style="border:1px solid var(--mid);border-radius:6px;padding:11px 14px"><strong style="font-size:14px;display:block;margin-bottom:3px">Silent Block</strong><p style="font-size:12.5px;color:#555">Rubber-bonded bushing in wishbone ends. The bolt MUST pass through the rubber centre — never bypass it.</p></div>
+    <div style="border:1px solid var(--mid);border-radius:6px;padding:11px 14px"><strong style="font-size:14px;display:block;margin-bottom:3px">Parallel Key</strong><p style="font-size:12.5px;color:#555">Small rectangular metal bar that locks two rotating parts (axle + sprocket) together. Always grease before inserting.</p></div>
+    <div style="border:1px solid var(--mid);border-radius:6px;padding:11px 14px"><strong style="font-size:14px;display:block;margin-bottom:3px">Cardan Shaft</strong><p style="font-size:12.5px;color:#555">Universal-joint driveshaft connecting motor output to rear wheel axle. Has a spring inside — do NOT forget it when assembling.</p></div>
+    <div style="border:1px solid var(--mid);border-radius:6px;padding:11px 14px"><strong style="font-size:14px;display:block;margin-bottom:3px">Bafang Max</strong><p style="font-size:12.5px;color:#555">The 250W mid-drive electric motor. Torque-sensing — feels how hard you pedal and provides proportional assist.</p></div>
+    <div style="border:1px solid var(--mid);border-radius:6px;padding:11px 14px"><strong style="font-size:14px;display:block;margin-bottom:3px">Rohloff Speedhub</strong><p style="font-size:12.5px;color:#555">14-speed internal gear hub. Shift via twist-grip on handlebar. Change gears only while pedalling lightly. Oil change every 5,000 km.</p></div>
+    <div style="border:1px solid var(--mid);border-radius:6px;padding:11px 14px"><strong style="font-size:14px;display:block;margin-bottom:3px">Freewheel</strong><p style="font-size:12.5px;color:#555">Ratchet mechanism between the motor and the chain. Allows you to coast without back-driving the motor. Two bearings inside a housing.</p></div>
+    <div style="border:1px solid var(--mid);border-radius:6px;padding:11px 14px"><strong style="font-size:14px;display:block;margin-bottom:3px">Front Boom</strong><p style="font-size:12.5px;color:#555">The forward-extending tube on the main frame that holds the pedals and chainring. The Bafang motor is at the rear of this tube.</p></div>
+    <div style="border:1px solid var(--mid);border-radius:6px;padding:11px 14px"><strong style="font-size:14px;display:block;margin-bottom:3px">IS Brake Adapter</strong><p style="font-size:12.5px;color:#555">"International Standard" brake caliper mount. A tab bolted to the kingpin that the caliper clamps to. Always use Loctite 222 on these bolts.</p></div>
+  </div>
+</section>
+
+<!-- ═══ LEFT / RIGHT GUIDE ═══ -->
+<section id="lrguide" class="pg">
+  <div class="lbl">Critical reference</div>
+  <div class="ttl">Left / Right Identification Guide</div>
+  <div class="sub">Many parts come in mirrored left/right pairs. Installing the wrong side in the wrong position causes geometry problems that are hard to diagnose. Use this guide every time you pick up a mirrored part.</div>
+  <div class="danger">The #1 build mistake is installing left/right mirrored parts on the wrong side. Always check before bolting down.</div>
+  <div class="lrguide">
+    <div class="lrbox left">
+      <h4 style="color:#1565c0">LEFT SIDE</h4>
+      <svg width="60" height="60" viewBox="0 0 60 60"><text x="30" y="38" text-anchor="middle" font-size="28" font-weight="900" fill="#1565c0">L</text><circle cx="30" cy="30" r="26" fill="none" stroke="#1565c0" stroke-width="2.5"/></svg>
+      <p style="color:#1565c0;margin-top:8px"><strong>= the rider's left hand</strong></p>
+      <p>When sitting in the bike facing forward, the LEFT side is your left hand side — which is the same side as the Rohloff gear hub and the twist-grip shifter.</p>
+    </div>
+    <div class="lrbox right">
+      <h4 style="color:#c62828">RIGHT SIDE</h4>
+      <svg width="60" height="60" viewBox="0 0 60 60"><text x="30" y="38" text-anchor="middle" font-size="28" font-weight="900" fill="#c62828">R</text><circle cx="30" cy="30" r="26" fill="none" stroke="#c62828" stroke-width="2.5"/></svg>
+      <p style="color:#c62828;margin-top:8px"><strong>= the rider's right hand</strong></p>
+      <p>When sitting in the bike facing forward, the RIGHT side is your right hand side — the drive side. The Bafang chainring, chain and main drivetrain are on this side.</p>
+    </div>
+  </div>
+  <h3 style="font-size:16px;font-weight:800;margin:20px 0 12px">How to Check a Mirrored Part</h3>
+  <div class="istrip">
+    <div class="iitem" style="max-width:200px">
+      <svg width="160" height="80" viewBox="0 0 160 80">
+        <!-- wishbone V shape -->
+        <path d="M80,70 L20,15 L140,15" fill="none" stroke="#1a1a1a" stroke-width="3"/>
+        <circle cx="20" cy="15" r="6" fill="none" stroke="#1565c0" stroke-width="2"/>
+        <circle cx="140" cy="15" r="6" fill="none" stroke="#1565c0" stroke-width="2"/>
+        <circle cx="80" cy="70" r="6" fill="none" stroke="#e65100" stroke-width="2"/>
+        <!-- brake tab on one side -->
+        <rect x="55" y="55" width="16" height="8" rx="2" fill="#c62828"/>
+        <text x="54" y="78" font-size="9" fill="#c62828">brake tab</text>
+        <text x="80" y="10" text-anchor="middle" font-size="9" fill="#555">Look for: brake adapter tabs,</text>
+      </svg>
+      <p>Find the brake tab. It always points in a specific direction — match to diagram.</p>
+    </div>
+    <div class="iitem" style="max-width:200px">
+      <svg width="160" height="80" viewBox="0 0 160 80">
+        <!-- bolt hole pattern -->
+        <rect x="30" y="20" width="100" height="50" rx="4" fill="none" stroke="#1a1a1a" stroke-width="2"/>
+        <circle cx="50" cy="35" r="5" fill="#1565c0"/>
+        <circle cx="110" cy="35" r="5" fill="#1565c0"/>
+        <circle cx="50" cy="55" r="5" fill="#1565c0"/>
+        <circle cx="110" cy="55" r="5" fill="#c62828"/>
+        <text x="110" y="70" text-anchor="middle" font-size="8" fill="#c62828">different</text>
+        <text x="80" y="14" text-anchor="middle" font-size="9" fill="#555">Compare bolt hole patterns</text>
+      </svg>
+      <p>Hold both parts side-by-side. L and R are mirror images — bolt holes on opposite sides.</p>
+    </div>
+    <div class="iitem" style="max-width:200px">
+      <svg width="160" height="80" viewBox="0 0 160 80">
+        <text x="80" y="30" text-anchor="middle" font-size="13" font-weight="900" fill="#1a1a1a">0072 = Front L</text>
+        <text x="80" y="50" text-anchor="middle" font-size="13" font-weight="900" fill="#1a1a1a">0073 = Front R</text>
+        <text x="80" y="75" text-anchor="middle" font-size="9" fill="#888">Part numbers tell you L/R</text>
+      </svg>
+      <p>Always check the part code. Matched pairs usually have consecutive numbers.</p>
+    </div>
+  </div>
+  <div class="tip">After identifying each mirrored pair, label them with masking tape ("FL", "FR", "RL", "RR") before you start assembling. Remove the tape as each part is installed.</div>
+</section>
+<!-- ═══════════════════════════════════════════════════
+     SECTION: KNOW YOUR PARTS
+═══════════════════════════════════════════════════ -->
+<section id="parts">
+  <h2>Know Your Parts</h2>
+  <p>Before you touch a single bolt, pick up each part, read its code, and match it to a card below. Build up this mental picture first — it saves hours of confusion later.</p>
+
+  <!-- MAIN FRAME -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <span class="comp-code">0074</span>
+      <span class="comp-name">Main Frame (Chassis)</span>
+    </div>
+    <div class="comp-body">
+      <div class="comp-diagram">
+        <svg width="220" height="120" viewBox="0 0 220 120">
+          <rect x="10" y="50" width="200" height="20" rx="4" fill="#b0bec5" stroke="#546e7a" stroke-width="2"/>
+          <rect x="20" y="30" width="40" height="40" rx="3" fill="#90a4ae" stroke="#546e7a" stroke-width="1.5"/>
+          <rect x="160" y="30" width="40" height="40" rx="3" fill="#90a4ae" stroke="#546e7a" stroke-width="1.5"/>
+          <circle cx="40" cy="50" r="8" fill="none" stroke="#c62828" stroke-width="2"/>
+          <circle cx="180" cy="50" r="8" fill="none" stroke="#c62828" stroke-width="2"/>
+          <text x="40" y="90" text-anchor="middle" font-size="8" fill="#c62828">Suspension</text>
+          <text x="40" y="99" text-anchor="middle" font-size="8" fill="#c62828">mount holes</text>
+          <text x="180" y="90" text-anchor="middle" font-size="8" fill="#c62828">Suspension</text>
+          <text x="180" y="99" text-anchor="middle" font-size="8" fill="#c62828">mount holes</text>
+          <text x="110" y="45" text-anchor="middle" font-size="9" font-weight="bold" fill="#1a1a1a">MAIN FRAME</text>
+          <line x1="110" y1="50" x2="110" y2="65" stroke="#888" stroke-width="1" stroke-dasharray="3,2"/>
+          <text x="110" y="73" text-anchor="middle" font-size="8" fill="#888">Bottom rail</text>
+        </svg>
+      </div>
+      <div class="comp-desc">
+        <p><strong>What it is:</strong> The backbone of the whole bike. A welded aluminium/steel tube structure that everything else bolts onto.</p>
+        <p><strong>Identify it:</strong> Longest single piece in the kit. Has four large circular holes at the corners where suspension arms attach. Also has a central tube for the bottom bracket (pedal axle).</p>
+        <p><strong>Handle with care:</strong> Do not drop — frame alignment is set at the factory. Any bend means the wheels won't track straight.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FRONT BOOM -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <span class="comp-code">0068</span>
+      <span class="comp-name">Front Boom (Pedal Tube)</span>
+    </div>
+    <div class="comp-body">
+      <div class="comp-diagram">
+        <svg width="220" height="110" viewBox="0 0 220 110">
+          <rect x="10" y="45" width="180" height="18" rx="6" fill="#a5d6a7" stroke="#2e7d32" stroke-width="2"/>
+          <circle cx="195" cy="54" r="12" fill="#66bb6a" stroke="#2e7d32" stroke-width="2"/>
+          <text x="195" y="58" text-anchor="middle" font-size="8" font-weight="bold" fill="#1a1a1a">BB</text>
+          <rect x="8" y="49" width="14" height="10" rx="2" fill="#388e3c" stroke="#2e7d32" stroke-width="1.5"/>
+          <text x="100" y="38" text-anchor="middle" font-size="8" fill="#2e7d32">← telescoping tube →</text>
+          <line x1="15" y1="35" x2="15" y2="44" stroke="#888" stroke-width="1"/>
+          <text x="15" y="32" text-anchor="middle" font-size="8" fill="#888">clamp end</text>
+          <line x1="195" y1="35" x2="195" y2="40" stroke="#888" stroke-width="1"/>
+          <text x="195" y="32" text-anchor="middle" font-size="8" fill="#888">BB end</text>
+          <text x="100" y="80" text-anchor="middle" font-size="8" fill="#555">Length adjusts for rider leg length</text>
+          <text x="100" y="93" text-anchor="middle" font-size="8" fill="#555">Clamp bolt torque: 8–10 Nm</text>
+        </svg>
+      </div>
+      <div class="comp-desc">
+        <p><strong>What it is:</strong> A telescoping tube that holds the bottom bracket (pedals) out in front of the rider. Think of it as the "pedal arm" of the bike.</p>
+        <p><strong>Identify it:</strong> Long round tube, narrower than the main frame. One end has a clamp/pinch collar; the other end has threads for the bottom bracket shell.</p>
+        <p><strong>Adjustment:</strong> Slide in or out to set saddle-to-pedal distance. Tighten clamp bolt to 8–10 Nm. Must be horizontal (use a spirit level).</p>
+        <div class="warning">⚠️ Never ride with the clamp bolt loose — the boom can slide forward under load and you will lose control of the pedals.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KINGPIN -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <span class="comp-code">0020 / 0021</span>
+      <span class="comp-name">Kingpin Assembly (Front Steering Pivot)</span>
+    </div>
+    <div class="comp-body">
+      <div class="comp-diagram">
+        <svg width="220" height="130" viewBox="0 0 220 130">
+          <rect x="95" y="10" width="20" height="100" rx="5" fill="#ffcc02" stroke="#f57f17" stroke-width="2"/>
+          <text x="105" y="60" text-anchor="middle" font-size="9" font-weight="bold" fill="#f57f17" writing-mode="tb" transform="rotate(-90,105,60)">KINGPIN BOLT</text>
+          <rect x="60" y="40" width="70" height="20" rx="4" fill="#b0bec5" stroke="#546e7a" stroke-width="1.5"/>
+          <text x="105" y="53" text-anchor="middle" font-size="8" fill="#1a1a1a">Steering knuckle</text>
+          <ellipse cx="105" cy="20" rx="15" ry="6" fill="#ffcc02" stroke="#f57f17" stroke-width="2"/>
+          <text x="105" y="23" text-anchor="middle" font-size="7" fill="#f57f17">TOP NUT</text>
+          <ellipse cx="105" cy="100" rx="15" ry="6" fill="#ffcc02" stroke="#f57f17" stroke-width="2"/>
+          <text x="105" y="103" text-anchor="middle" font-size="7" fill="#f57f17">BOTTOM NUT</text>
+          <line x1="30" y1="50" x2="59" y2="50" stroke="#c62828" stroke-width="1.5" stroke-dasharray="4,2"/>
+          <text x="15" y="47" font-size="8" fill="#c62828">grease</text>
+          <text x="15" y="57" font-size="8" fill="#c62828">bearings</text>
+          <line x1="150" y1="50" x2="131" y2="50" stroke="#888" stroke-width="1"/>
+          <text x="155" y="47" font-size="8" fill="#888">Upper</text>
+          <text x="155" y="57" font-size="8" fill="#888">wishbone</text>
+        </svg>
+      </div>
+      <div class="comp-desc">
+        <p><strong>What it is:</strong> A vertical bolt that acts as the steering pivot for each front wheel. The wheel assembly rotates around this bolt when you steer.</p>
+        <p><strong>Identify it:</strong> Gold/yellow bolt, ~150mm long, with a special shaped head. Used ONLY on front corners (×2 total).</p>
+        <p><strong>0020</strong> = Left kingpin (check thread direction). <strong>0021</strong> = Right kingpin.</p>
+        <p><strong>Critical:</strong> Grease the bearing surfaces before assembly. Torque to spec — too tight = stiff steering; too loose = wheel wobble.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- WISHBONE ARM -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <span class="comp-code">0072/0073/0075/0076</span>
+      <span class="comp-name">Wishbone Suspension Arms (×8 total)</span>
+    </div>
+    <div class="comp-body">
+      <div class="comp-diagram">
+        <svg width="220" height="130" viewBox="0 0 220 130">
+          <path d="M 30 65 L 100 40 L 170 65 L 100 90 Z" fill="none" stroke="#1565c0" stroke-width="3"/>
+          <circle cx="100" cy="65" r="8" fill="#1565c0" stroke="#0d47a1" stroke-width="2"/>
+          <circle cx="30" cy="65" r="6" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/>
+          <circle cx="170" cy="65" r="6" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/>
+          <text x="100" y="69" text-anchor="middle" font-size="8" fill="white">HUB</text>
+          <text x="30" y="82" text-anchor="middle" font-size="8" fill="#1565c0">Frame</text>
+          <text x="30" y="91" text-anchor="middle" font-size="8" fill="#1565c0">pivot L</text>
+          <text x="170" y="82" text-anchor="middle" font-size="8" fill="#1565c0">Frame</text>
+          <text x="170" y="91" text-anchor="middle" font-size="8" fill="#1565c0">pivot R</text>
+          <line x1="100" y1="40" x2="100" y2="15" stroke="#888" stroke-width="1"/>
+          <text x="100" y="12" text-anchor="middle" font-size="8" fill="#888">Upper arm</text>
+          <text x="100" y="115" text-anchor="middle" font-size="8" fill="#1565c0">0072=Front-Left Upper  0073=Front-Right Upper</text>
+          <text x="100" y="127" text-anchor="middle" font-size="8" fill="#1565c0">0075=Rear-Left Upper   0076=Rear-Right Upper</text>
+        </svg>
+      </div>
+      <div class="comp-desc">
+        <p><strong>What it is:</strong> A triangular metal arm that connects each wheel to the frame. Each corner of the bike has TWO wishbones — one upper and one lower. This is the "double wishbone" suspension system.</p>
+        <p><strong>Identify it:</strong> V-shaped or triangular steel arm with three holes: two at the frame end (wide apart) and one at the wheel end (narrow, for kingpin/axle).</p>
+        <p><strong>8 arms total:</strong> 4 upper + 4 lower, one per wheel corner. They are NOT interchangeable — upper and lower are different sizes.</p>
+        <div class="tip">Label each arm with masking tape (e.g., "FL Upper", "FR Lower") as soon as you unpack them.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROD END -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <span class="comp-code">0017 / 0018 / 0019</span>
+      <span class="comp-name">Rod Ends (Pivot Ball Joints)</span>
+    </div>
+    <div class="comp-body">
+      <div class="comp-diagram">
+        <svg width="220" height="120" viewBox="0 0 220 120">
+          <rect x="80" y="40" width="60" height="30" rx="4" fill="#ffe082" stroke="#f9a825" stroke-width="2"/>
+          <circle cx="110" cy="55" r="12" fill="#fff9c4" stroke="#f9a825" stroke-width="2"/>
+          <circle cx="110" cy="55" r="5" fill="#f9a825"/>
+          <rect x="30" y="51" width="50" height="8" rx="3" fill="#bdbdbd" stroke="#757575" stroke-width="1.5"/>
+          <rect x="140" y="51" width="45" height="8" rx="3" fill="#bdbdbd" stroke="#757575" stroke-width="1.5"/>
+          <text x="55" y="47" text-anchor="middle" font-size="9" fill="#555">threaded shank</text>
+          <text x="110" y="55" text-anchor="middle" font-size="7" fill="#f9a825">BALL</text>
+          <line x1="32" y1="67" x2="32" y2="80" stroke="#c62828" stroke-width="1"/>
+          <text x="32" y="90" text-anchor="middle" font-size="8" fill="#c62828">L-thread</text>
+          <text x="32" y="100" text-anchor="middle" font-size="8" fill="#c62828">(0018: M8)</text>
+          <line x1="162" y1="67" x2="162" y2="80" stroke="#2e7d32" stroke-width="1"/>
+          <text x="162" y="90" text-anchor="middle" font-size="8" fill="#2e7d32">R-thread</text>
+          <text x="162" y="100" text-anchor="middle" font-size="8" fill="#2e7d32">(0019: M8)</text>
+          <text x="110" y="115" text-anchor="middle" font-size="8" fill="#555">0017 = M10 (suspension)  0018/0019 = M8 steering</text>
+        </svg>
+      </div>
+      <div class="comp-desc">
+        <p><strong>What it is:</strong> A ball joint on a threaded rod. One end screws into the wishbone arm; the ball end pivots freely in all directions. This allows the suspension to move without binding.</p>
+        <p><strong>Three types:</strong></p>
+        <p>• <strong>0017</strong> — M10 thread, for suspension arms (larger, heftier)</p>
+        <p>• <strong>0018</strong> — M8 LEFT-HAND thread (groove marked on hex), for steering</p>
+        <p>• <strong>0019</strong> — M8 RIGHT-HAND thread (no groove), for steering</p>
+        <div class="warning">⚠️ LEFT-HAND thread (0018) tightens COUNTER-CLOCKWISE. Mark it with blue tape to avoid stripping it. You can identify it by the groove cut into the hex flats.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BELLOW -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <span class="comp-code">0022</span>
+      <span class="comp-name">Bellows (Rubber Dust Boots)</span>
+    </div>
+    <div class="comp-body">
+      <div class="comp-diagram">
+        <svg width="220" height="100" viewBox="0 0 220 100">
+          <path d="M 60 30 Q 80 20 110 25 Q 140 20 160 30 L 160 70 Q 140 80 110 75 Q 80 80 60 70 Z" fill="#546e7a" stroke="#37474f" stroke-width="2"/>
+          <line x1="60" y1="50" x2="160" y2="50" stroke="#78909c" stroke-width="1" stroke-dasharray="5,3"/>
+          <path d="M 60 40 L 60 60" stroke="#90a4ae" stroke-width="3"/>
+          <path d="M 160 40 L 160 60" stroke="#90a4ae" stroke-width="3"/>
+          <line x1="108" y1="25" x2="108" y2="10" stroke="#c62828" stroke-width="1.5"/>
+          <text x="108" y="7" text-anchor="middle" font-size="9" fill="#c62828">SIDE SLIT</text>
+          <text x="108" y="92" text-anchor="middle" font-size="9" fill="#555">Squash flat → insert rod end shank through SIDE slit</text>
+        </svg>
+      </div>
+      <div class="comp-desc">
+        <p><strong>What it is:</strong> A rubber accordion boot that wraps around a rod end to keep dirt and water out. Without it, the ball joint wears out quickly.</p>
+        <p><strong>Identify it:</strong> Small black rubber sleeve with a slit along one side. Looks like a miniature accordion.</p>
+        <p><strong>How to fit:</strong> Do NOT try to push the rod end through the end hole. Instead: squash the bellow flat → open the side slit → slip the rod end shank into the slit → release → bellow wraps around naturally.</p>
+        <div class="tip">Tip: A tiny smear of dish soap on the rubber makes it slide on much easier.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DISTANCE BUSH -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <span class="comp-code">DR8 / DR10</span>
+      <span class="comp-name">Distance Bushes (Spacer Cylinders)</span>
+    </div>
+    <div class="comp-body">
+      <div class="comp-diagram">
+        <svg width="220" height="110" viewBox="0 0 220 110">
+          <rect x="80" y="20" width="60" height="60" rx="5" fill="#e8eaf6" stroke="#3949ab" stroke-width="2"/>
+          <circle cx="110" cy="50" r="15" fill="white" stroke="#3949ab" stroke-width="2"/>
+          <circle cx="110" cy="50" r="5" fill="#3949ab"/>
+          <line x1="110" y1="35" x2="110" y2="15" stroke="#888" stroke-width="1"/>
+          <text x="110" y="12" text-anchor="middle" font-size="8" fill="#888">bolt passes through</text>
+          <line x1="45" y1="50" x2="78" y2="50" stroke="#c62828" stroke-width="1.5"/>
+          <text x="40" y="48" text-anchor="end" font-size="9" fill="#c62828">DR8 =</text>
+          <text x="40" y="58" text-anchor="end" font-size="9" fill="#c62828">M8 bolt</text>
+          <line x1="175" y1="50" x2="142" y2="50" stroke="#2e7d32" stroke-width="1.5"/>
+          <text x="178" y="48" font-size="9" fill="#2e7d32">DR10 =</text>
+          <text x="178" y="58" font-size="9" fill="#2e7d32">M10 bolt</text>
+          <text x="110" y="100" text-anchor="middle" font-size="8" fill="#555">Sits inside wishbone hole — prevents over-clamping</text>
+        </svg>
+      </div>
+      <div class="comp-desc">
+        <p><strong>What it is:</strong> A short metal cylinder (spacer) that goes inside the wishbone arm hole before the bolt is inserted. It limits how far you can tighten the bolt, preventing you from crushing the silent block rubber.</p>
+        <p><strong>DR8</strong> = for M8 bolts (smaller, ~8mm inner diameter). <strong>DR10</strong> = for M10 bolts (larger, ~10mm inner diameter).</p>
+        <p><strong>Assembly order:</strong> Wishbone hole → distance bush → silent block → bolt. The bush and silent block sit concentrically.</p>
+        <div class="warning">⚠️ Missing a distance bush = over-tightening = crushed rubber = suspension binding or failure.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SILENT BLOCK -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <span class="comp-code">0026 / 0027</span>
+      <span class="comp-name">Silent Blocks (Rubber Frame Bushings)</span>
+    </div>
+    <div class="comp-body">
+      <div class="comp-diagram">
+        <svg width="220" height="110" viewBox="0 0 220 110">
+          <rect x="70" y="20" width="80" height="70" rx="8" fill="#a5d6a7" stroke="#388e3c" stroke-width="2"/>
+          <circle cx="110" cy="55" r="22" fill="#c8e6c9" stroke="#388e3c" stroke-width="2"/>
+          <circle cx="110" cy="55" r="8" fill="#388e3c" stroke="#2e7d32" stroke-width="1.5"/>
+          <text x="110" y="59" text-anchor="middle" font-size="7" fill="white">metal</text>
+          <text x="110" y="30" text-anchor="middle" font-size="8" fill="#2e7d32">outer rubber ring</text>
+          <line x1="30" y1="55" x2="68" y2="55" stroke="#888" stroke-width="1"/>
+          <text x="28" y="53" text-anchor="end" font-size="8" fill="#555">press-fit</text>
+          <text x="28" y="63" text-anchor="end" font-size="8" fill="#555">into frame</text>
+          <text x="110" y="103" text-anchor="middle" font-size="8" fill="#555">Bolt passes through centre metal sleeve</text>
+        </svg>
+      </div>
+      <div class="comp-desc">
+        <p><strong>What it is:</strong> A rubber-and-metal sandwich bushing that is pressed into the frame (chassis) holes at the wishbone pivot points. The rubber absorbs vibration and small misalignments.</p>
+        <p><strong>Identify it:</strong> Short cylinder with a rubber outer sleeve and a metal inner sleeve. About the diameter of a 10p coin.</p>
+        <p><strong>Fitting:</strong> Press into frame hole by hand first, then use a bench vice or large socket to seat it fully flush. The bolt MUST pass through the metal inner sleeve — never through the rubber.</p>
+        <div class="tip">If the silent block spins in the hole, it wasn't pressed in fully. Re-seat it before bolting.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOCK ABSORBER -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <span class="comp-code">0142</span>
+      <span class="comp-name">Shock Absorbers (×4)</span>
+    </div>
+    <div class="comp-body">
+      <div class="comp-diagram">
+        <svg width="220" height="130" viewBox="0 0 220 130">
+          <rect x="95" y="15" width="30" height="90" rx="5" fill="#e0e0e0" stroke="#616161" stroke-width="2"/>
+          <rect x="100" y="15" width="20" height="40" rx="3" fill="#bdbdbd" stroke="#616161" stroke-width="1.5"/>
+          <rect x="103" y="55" width="14" height="50" rx="2" fill="#9e9e9e" stroke="#616161" stroke-width="1"/>
+          <circle cx="110" cy="15" r="8" fill="#757575" stroke="#616161" stroke-width="2"/>
+          <circle cx="110" cy="105" r="8" fill="#757575" stroke="#616161" stroke-width="2"/>
+          <text x="110" y="12" text-anchor="middle" font-size="7" fill="white">eye</text>
+          <text x="110" y="108" text-anchor="middle" font-size="7" fill="white">eye</text>
+          <line x1="145" y1="35" x2="131" y2="35" stroke="#c62828" stroke-width="1.5"/>
+          <text x="148" y="38" font-size="8" fill="#c62828">damper body</text>
+          <line x1="145" y1="80" x2="118" y2="80" stroke="#2e7d32" stroke-width="1.5"/>
+          <text x="148" y="83" font-size="8" fill="#2e7d32">piston rod</text>
+          <text x="110" y="125" text-anchor="middle" font-size="8" fill="#555">One eye top, one eye bottom</text>
+        </svg>
+      </div>
+      <div class="comp-desc">
+        <p><strong>What it is:</strong> A hydraulic damper (like a car shock absorber) that cushions bumps. One at each wheel corner (4 total).</p>
+        <p><strong>Identify it:</strong> A cylindrical unit about 150–200mm long with a metal eye (loop) at each end. When you push the two eyes together it resists — that's the oil damping.</p>
+        <p><strong>Orientation:</strong> Damper body faces UP; piston rod faces DOWN. Never mount upside-down — oil will pool in the wrong chamber and damping fails.</p>
+        <p><strong>Mounting:</strong> Eye bolts through the wishbone and frame bracket. Use the supplied M8 bolts + nylon-stop nuts. Torque 25 Nm.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARDAN SHAFT -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <span class="comp-code">0192</span>
+      <span class="comp-name">Cardan Shaft (Universal-Joint Driveshaft ×2)</span>
+    </div>
+    <div class="comp-body">
+      <div class="comp-diagram">
+        <svg width="220" height="120" viewBox="0 0 220 120">
+          <rect x="10" y="50" width="55" height="18" rx="4" fill="#ce93d8" stroke="#7b1fa2" stroke-width="2"/>
+          <rect x="155" y="50" width="55" height="18" rx="4" fill="#ce93d8" stroke="#7b1fa2" stroke-width="2"/>
+          <path d="M 65 54 L 85 50 L 95 59 L 85 68 L 65 64 Z" fill="#ab47bc" stroke="#7b1fa2" stroke-width="1.5"/>
+          <path d="M 155 54 L 135 50 L 125 59 L 135 68 L 155 64 Z" fill="#ab47bc" stroke="#7b1fa2" stroke-width="1.5"/>
+          <rect x="95" y="52" width="30" height="14" rx="3" fill="#7b1fa2" stroke="#4a148c" stroke-width="2"/>
+          <text x="110" y="62" text-anchor="middle" font-size="7" fill="white">cross joint</text>
+          <line x1="38" y1="68" x2="38" y2="85" stroke="#c62828" stroke-width="1"/>
+          <text x="38" y="95" text-anchor="middle" font-size="7" fill="#c62828">splined end</text>
+          <text x="38" y="105" text-anchor="middle" font-size="7" fill="#c62828">(to motor)</text>
+          <line x1="183" y1="68" x2="183" y2="85" stroke="#2e7d32" stroke-width="1"/>
+          <text x="183" y="95" text-anchor="middle" font-size="7" fill="#2e7d32">splined end</text>
+          <text x="183" y="105" text-anchor="middle" font-size="7" fill="#2e7d32">(to sprocket)</text>
+          <circle cx="110" cy="59" r="3" fill="#ffcc02"/>
+          <text x="150" y="30" text-anchor="middle" font-size="8" fill="#7b1fa2">↑ internal spring — must be present!</text>
+        </svg>
+      </div>
+      <div class="comp-desc">
+        <p><strong>What it is:</strong> A two-piece driveshaft with a cross-shaped universal joint in the middle. Transmits pedal power from the motor/chainring to the rear wheel sprocket even when the suspension moves up and down.</p>
+        <p><strong>Identify it:</strong> Two metal tubes joined by a cross-shaped spider joint in the middle. Has splined ends that slide onto axles. About 300–400mm long.</p>
+        <p><strong>CRITICAL — internal spring:</strong> Inside one of the tubes is a small coil spring. Before connecting the shaft, verify this spring is present. Without it, the shaft will rattle and can disconnect under load.</p>
+        <p><strong>2 shafts:</strong> One per rear wheel (left and right).</p>
+        <div class="warning">⚠️ Always check spring is present before installing. Shake the shaft — you should hear/feel a slight spring resistance at the mid-joint.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PARALLEL KEY -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <span class="comp-code">6×6×20mm</span>
+      <span class="comp-name">Parallel Keys (Woodruff Keys)</span>
+    </div>
+    <div class="comp-body">
+      <div class="comp-diagram">
+        <svg width="220" height="100" viewBox="0 0 220 100">
+          <rect x="70" y="35" width="80" height="25" rx="3" fill="#ffcc02" stroke="#f57f17" stroke-width="2"/>
+          <text x="110" y="52" text-anchor="middle" font-size="10" font-weight="bold" fill="#f57f17">6 × 6 × 20 mm</text>
+          <line x1="70" y1="65" x2="70" y2="80" stroke="#888" stroke-width="1"/>
+          <text x="70" y="90" text-anchor="middle" font-size="8" fill="#888">6mm</text>
+          <line x1="150" y1="65" x2="150" y2="80" stroke="#888" stroke-width="1"/>
+          <text x="150" y="90" text-anchor="middle" font-size="8" fill="#888">20mm</text>
+          <line x1="70" y1="72" x2="150" y2="72" stroke="#888" stroke-width="1" marker-start="url(#arr)" marker-end="url(#arr)"/>
+          <rect x="20" y="42" width="45" height="10" rx="2" fill="#e0e0e0" stroke="#616161" stroke-width="1"/>
+          <rect x="155" y="42" width="45" height="10" rx="2" fill="#e0e0e0" stroke="#616161" stroke-width="1"/>
+          <text x="43" y="35" text-anchor="middle" font-size="8" fill="#555">axle slot</text>
+          <text x="178" y="35" text-anchor="middle" font-size="8" fill="#555">hub slot</text>
+          <text x="110" y="15" text-anchor="middle" font-size="9" fill="#f57f17">Key sits half in axle, half in hub — locks rotation</text>
+        </svg>
+      </div>
+      <div class="comp-desc">
+        <p><strong>What it is:</strong> A small rectangular metal prism that fits into matching slots cut into both a shaft (axle) and a hub (sprocket/gear). It prevents the sprocket from spinning on the axle.</p>
+        <p><strong>Identify it:</strong> Tiny rectangular steel bar, exactly 6mm × 6mm × 20mm. Looks like a small piece of square bar stock.</p>
+        <p><strong>Installation:</strong> Clean both slots → apply a film of grease → press key into axle slot → align hub slot → push hub onto axle. The key should be a snug sliding fit, not sloppy.</p>
+        <div class="warning">⚠️ A dry or loose key will hammer back and forth and cause wear. Grease prevents fretting corrosion.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FREEWHEEL ASSEMBLY -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <span class="comp-code">0008 + 0069 + 0088</span>
+      <span class="comp-name">Freewheel Assembly</span>
+    </div>
+    <div class="comp-body">
+      <div class="comp-diagram">
+        <svg width="220" height="130" viewBox="0 0 220 130">
+          <!-- axle -->
+          <rect x="20" y="57" width="180" height="14" rx="3" fill="#9e9e9e" stroke="#616161" stroke-width="2"/>
+          <text x="110" y="66" text-anchor="middle" font-size="8" fill="white">Axle 0069</text>
+          <!-- housing -->
+          <rect x="70" y="35" width="80" height="58" rx="6" fill="#b3e5fc" stroke="#0277bd" stroke-width="2"/>
+          <!-- bearing left -->
+          <ellipse cx="80" cy="64" rx="8" ry="20" fill="#e3f2fd" stroke="#0277bd" stroke-width="1.5"/>
+          <text x="80" y="100" text-anchor="middle" font-size="7" fill="#0277bd">bearing</text>
+          <!-- bearing right -->
+          <ellipse cx="140" cy="64" rx="8" ry="20" fill="#e3f2fd" stroke="#0277bd" stroke-width="1.5"/>
+          <text x="140" y="100" text-anchor="middle" font-size="7" fill="#0277bd">bearing</text>
+          <text x="110" y="55" text-anchor="middle" font-size="8" fill="#0277bd">Housing 0088</text>
+          <text x="110" y="73" text-anchor="middle" font-size="8" fill="#0277bd">Bearings 0008</text>
+          <!-- labels -->
+          <text x="110" y="120" text-anchor="middle" font-size="9" font-weight="bold" fill="#01579b">Grease bearings before pressing in</text>
+        </svg>
+      </div>
+      <div class="comp-desc">
+        <p><strong>What it is:</strong> The freewheel lets you coast without pedalling. It consists of a cylindrical housing (0088) with two press-fit bearings (0008) mounted on an axle (0069). The internal ratchet mechanism allows the chain to drive the wheel forward but spin freely when you stop pedalling.</p>
+        <p><strong>Pre-assembly (do this before Phase 4):</strong></p>
+        <p>1. Press bearing 0008 into housing 0088 with grease — use a socket the same size as the bearing outer race</p>
+        <p>2. Repeat for second bearing on opposite side</p>
+        <p>3. Slide axle 0069 through both bearings</p>
+        <p>4. Secure with circlip (check it seats in groove)</p>
+        <div class="warning">⚠️ Bearings must be pressed in straight. A tilted bearing will bind and wear out quickly. Use a vice with flat jaws.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BAFANG MOTOR -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <span class="comp-code">0015</span>
+      <span class="comp-name">Bafang Max Mid-Drive Motor (250W)</span>
+    </div>
+    <div class="comp-body">
+      <div class="comp-diagram">
+        <svg width="220" height="130" viewBox="0 0 220 130">
+          <circle cx="110" cy="65" r="55" fill="#e3f2fd" stroke="#1565c0" stroke-width="3"/>
+          <circle cx="110" cy="65" r="20" fill="#1565c0" stroke="#0d47a1" stroke-width="2"/>
+          <text x="110" y="63" text-anchor="middle" font-size="7" fill="white">BAFANG</text>
+          <text x="110" y="72" text-anchor="middle" font-size="7" fill="white">MAX 250W</text>
+          <rect x="85" y="8" width="50" height="14" rx="3" fill="#ffcc02" stroke="#f57f17" stroke-width="1.5"/>
+          <text x="110" y="18" text-anchor="middle" font-size="7" fill="#f57f17">motor cable exit</text>
+          <rect x="155" y="55" width="50" height="20" rx="3" fill="#a5d6a7" stroke="#388e3c" stroke-width="1.5"/>
+          <text x="180" y="68" text-anchor="middle" font-size="8" fill="#2e7d32">BB threads</text>
+          <text x="110" y="118" text-anchor="middle" font-size="8" fill="#555">Torque: 17–18 Nm on BB threads</text>
+          <text x="110" y="128" text-anchor="middle" font-size="8" fill="#555">Left = non-drive side | Right = drive side</text>
+        </svg>
+      </div>
+      <div class="comp-desc">
+        <p><strong>What it is:</strong> The electric motor that assists your pedalling. It fits into the bottom bracket shell of the front boom (replaces the normal pedal axle). It is a "torque-sensing" motor — it only adds power when you push harder on the pedals.</p>
+        <p><strong>Identify it:</strong> Large round unit (~120mm diameter) with a central threaded spindle, a cable exiting the top, and two flat sides for a BB tool. Branded "Bafang".</p>
+        <p><strong>Sides:</strong> The drive side (right, where chain goes) has a chainring spider. The non-drive side (left) has the cable exit.</p>
+        <p><strong>Thread size:</strong> 68mm BSA (standard British bike thread) or 73mm depending on frame spec.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAINRINGS -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <span class="comp-code">0003 / 0013</span>
+      <span class="comp-name">Chainrings (42T Front + 38T Freewheel)</span>
+    </div>
+    <div class="comp-body">
+      <div class="comp-diagram">
+        <svg width="220" height="120" viewBox="0 0 220 120">
+          <!-- 42T -->
+          <circle cx="70" cy="60" r="45" fill="none" stroke="#ff6f00" stroke-width="2"/>
+          <circle cx="70" cy="60" r="38" fill="none" stroke="#ff6f00" stroke-width="4"/>
+          <circle cx="70" cy="60" r="12" fill="#ff6f00" stroke="#e65100" stroke-width="2"/>
+          <text x="70" y="64" text-anchor="middle" font-size="9" fill="white" font-weight="bold">42T</text>
+          <text x="70" y="110" text-anchor="middle" font-size="8" fill="#ff6f00">0003 Front Ring</text>
+          <!-- 38T -->
+          <circle cx="160" cy="60" r="38" fill="none" stroke="#6d4c41" stroke-width="2"/>
+          <circle cx="160" cy="60" r="32" fill="none" stroke="#6d4c41" stroke-width="4"/>
+          <circle cx="160" cy="60" r="10" fill="#6d4c41" stroke="#4e342e" stroke-width="2"/>
+          <text x="160" y="64" text-anchor="middle" font-size="9" fill="white" font-weight="bold">38T</text>
+          <text x="160" y="110" text-anchor="middle" font-size="8" fill="#6d4c41">0013 Freewheel Ring</text>
+          <text x="115" y="15" text-anchor="middle" font-size="8" fill="#555">T = teeth count  |  More teeth = harder gear</text>
+        </svg>
+      </div>
+      <div class="comp-desc">
+        <p><strong>What they are:</strong> Toothed rings that the chain runs on. The 42T front chainring (0003) is bolted to the Bafang motor spider. The 38T ring (0013) mounts on the freewheel assembly at the rear and drives the Rohloff hub via a second chain.</p>
+        <p><strong>Identify them:</strong> Steel or aluminium rings with teeth around the outer edge. The 42T is slightly larger (more teeth) than the 38T.</p>
+        <p><strong>Mounting bolts:</strong> Use chainring bolts with Loctite 243. Tighten in a star pattern (like wheel lug nuts) to 8–10 Nm. Check all 5 bolts are tight after first ride.</p>
+        <div class="tip">Count the teeth if unsure which is which: 42 teeth = bigger = goes on the motor (front).</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAIN IDLERS -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <span class="comp-code">0006 / 0007</span>
+      <span class="comp-name">Chain Idler Pulleys</span>
+    </div>
+    <div class="comp-body">
+      <div class="comp-diagram">
+        <svg width="220" height="100" viewBox="0 0 220 100">
+          <circle cx="80" cy="50" r="30" fill="#e8eaf6" stroke="#3949ab" stroke-width="2"/>
+          <circle cx="80" cy="50" r="18" fill="white" stroke="#3949ab" stroke-width="1.5"/>
+          <circle cx="80" cy="50" r="5" fill="#3949ab"/>
+          <text x="80" y="90" text-anchor="middle" font-size="8" fill="#3949ab">0006 Upper idler</text>
+          <circle cx="155" cy="50" r="22" fill="#e8eaf6" stroke="#3949ab" stroke-width="2"/>
+          <circle cx="155" cy="50" r="12" fill="white" stroke="#3949ab" stroke-width="1.5"/>
+          <circle cx="155" cy="50" r="5" fill="#3949ab"/>
+          <text x="155" y="90" text-anchor="middle" font-size="8" fill="#3949ab">0007 Lower idler</text>
+          <text x="115" y="15" text-anchor="middle" font-size="8" fill="#555">Keep chain on correct path around frame</text>
+        </svg>
+      </div>
+      <div class="comp-desc">
+        <p><strong>What they are:</strong> Small toothed pulley wheels mounted on the frame that guide the chain around corners and keep it from drooping or rubbing the frame.</p>
+        <p><strong>Two idlers:</strong> 0006 (upper, larger) guides the chain over the top. 0007 (lower, smaller) guides the return run under the frame.</p>
+        <p><strong>Bearing inside:</strong> Each idler spins on a sealed bearing. When fitting, make sure the bolt passes through the bearing inner race — do not overtighten or the bearing will bind.</p>
+        <div class="tip">After chain installation, rotate pedals slowly and watch each idler. All should spin freely with no chain rubbing.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROHLOFF HUB -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <span class="comp-code">Rohloff Speedhub 500/14</span>
+      <span class="comp-name">14-Speed Internal Gear Hub</span>
+    </div>
+    <div class="comp-body">
+      <div class="comp-diagram">
+        <svg width="220" height="130" viewBox="0 0 220 130">
+          <ellipse cx="110" cy="65" rx="70" ry="50" fill="#fff9c4" stroke="#f9a825" stroke-width="3"/>
+          <circle cx="110" cy="65" r="15" fill="#f9a825" stroke="#f57f17" stroke-width="2"/>
+          <text x="110" y="63" text-anchor="middle" font-size="8" fill="white">ROHLOFF</text>
+          <text x="110" y="73" text-anchor="middle" font-size="8" fill="white">500/14</text>
+          <rect x="155" y="45" width="8" height="40" rx="2" fill="#bdbdbd" stroke="#616161" stroke-width="1"/>
+          <rect x="57" y="45" width="8" height="40" rx="2" fill="#bdbdbd" stroke="#616161" stroke-width="1"/>
+          <line x1="163" y1="65" x2="195" y2="65" stroke="#f9a825" stroke-width="2"/>
+          <text x="200" y="62" font-size="8" fill="#f57f17">cable 1</text>
+          <text x="200" y="72" font-size="8" fill="#f57f17">cable 2</text>
+          <line x1="163" y1="68" x2="195" y2="68" stroke="#e65100" stroke-width="2"/>
+          <text x="110" y="125" text-anchor="middle" font-size="8" fill="#555">2 shift cables | bayonet axle ends | sprocket 40 Nm</text>
+        </svg>
+      </div>
+      <div class="comp-desc">
+        <p><strong>What it is:</strong> A premium 14-speed gearbox built into the rear wheel hub. All gears are sealed inside the hub — no derailleur, no exposed cables, weather-proof.</p>
+        <p><strong>Identify it:</strong> Large chrome/silver hub on the rear wheel, noticeably bigger than a normal hub. Has TWO cable exit ports on the drive side. Stamped "Rohloff Speedhub 500/14".</p>
+        <p><strong>Key features:</strong> Bayonet axle ends (twist to remove wheel), oil-bath lubrication (change oil annually), 2 shift cables (both needed), twist-grip shifter only.</p>
+        <p><strong>Sprocket torque:</strong> 40 Nm with thread-lock compound. This is the highest torque in the build — use a proper torque wrench.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROHLOFF SHIFTER -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <span class="comp-code">Rohloff Twist Shifter</span>
+      <span class="comp-name">Handlebar Gear Shifter</span>
+    </div>
+    <div class="comp-body">
+      <div class="comp-diagram">
+        <svg width="220" height="110" viewBox="0 0 220 110">
+          <rect x="30" y="45" width="160" height="20" rx="8" fill="#90a4ae" stroke="#546e7a" stroke-width="2"/>
+          <rect x="160" y="35" width="40" height="40" rx="10" fill="#546e7a" stroke="#37474f" stroke-width="2"/>
+          <text x="180" y="58" text-anchor="middle" font-size="8" fill="white">TWIST</text>
+          <text x="180" y="67" text-anchor="middle" font-size="8" fill="white">GRIP</text>
+          <line x1="168" y1="75" x2="168" y2="95" stroke="#e65100" stroke-width="2"/>
+          <text x="168" y="105" text-anchor="middle" font-size="7" fill="#e65100">cable 1</text>
+          <line x1="180" y1="75" x2="180" y2="95" stroke="#1565c0" stroke-width="2"/>
+          <text x="180" y="105" text-anchor="middle" font-size="7" fill="#1565c0">cable 2</text>
+          <text x="90" y="38" text-anchor="middle" font-size="8" fill="#555">handlebar tube</text>
+          <text x="90" y="80" text-anchor="middle" font-size="8" fill="#555">Gear indicator window →</text>
+        </svg>
+      </div>
+      <div class="comp-desc">
+        <p><strong>What it is:</strong> The gear-change control on the handlebar. Rotate the rubber grip to shift up or down through 14 gears. Has a small window showing the current gear number.</p>
+        <p><strong>Identify it:</strong> Oversized handlebar grip with a numbered window (1–14). Two thin shift cables exit from the body.</p>
+        <p><strong>Installation:</strong> Clamp onto handlebar with the two included M3 bolts. Run two shift cables (different lengths) from shifter to Rohloff hub. Cable tension is critical — see Phase 5.</p>
+        <p><strong>Shift only when pedalling:</strong> Rohloff requires the drivetrain to be under slight load to shift cleanly. Do not shift while stationary.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- BATTERY -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <span class="comp-code">Battery Pack + Mount (0047)</span>
+      <span class="comp-name">Lithium Battery &amp; Mount</span>
+    </div>
+    <div class="comp-body">
+      <div class="comp-diagram">
+        <svg width="220" height="130" viewBox="0 0 220 130">
+          <rect x="40" y="20" width="140" height="70" rx="8" fill="#e8f5e9" stroke="#2e7d32" stroke-width="3"/>
+          <rect x="50" y="30" width="120" height="50" rx="4" fill="#c8e6c9" stroke="#388e3c" stroke-width="1.5"/>
+          <rect x="170" y="40" width="14" height="30" rx="3" fill="#2e7d32"/>
+          <text x="110" y="62" text-anchor="middle" font-size="11" font-weight="bold" fill="#1b5e20">BATTERY</text>
+          <line x1="80" y1="90" x2="80" y2="110" stroke="#c62828" stroke-width="2"/>
+          <rect x="70" y="110" width="20" height="10" rx="2" fill="#c62828"/>
+          <text x="80" y="118" text-anchor="middle" font-size="7" fill="white">+ XT60</text>
+          <line x1="140" y1="90" x2="140" y2="110" stroke="#212121" stroke-width="2"/>
+          <rect x="130" y="110" width="20" height="10" rx="2" fill="#212121"/>
+          <text x="140" y="118" text-anchor="middle" font-size="7" fill="white">– XT60</text>
+          <text x="110" y="128" text-anchor="middle" font-size="8" fill="#555">Keep as low and centred as possible</text>
+        </svg>
+      </div>
+      <div class="comp-desc">
+        <p><strong>What it is:</strong> The lithium-ion rechargeable battery that powers the Bafang motor. Mounts to the frame via bracket 0047.</p>
+        <p><strong>Voltage:</strong> Must match the motor voltage exactly (typically 36V or 48V). Mixing voltages will damage the motor controller.</p>
+        <p><strong>Connectors:</strong> XT60 (yellow plastic, gold pins) or XT90 (larger). Red = positive (+), Black = negative (−). NEVER connect reversed.</p>
+        <p><strong>Position:</strong> Mount as low as possible on the frame for better handling. Avoid mounting high up — raises the centre of gravity.</p>
+        <div class="warning">⚠️ Never short the battery terminals. Keep the battery away from water and fire. If the battery swells, do NOT charge it — dispose of it safely at a battery recycling point.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAIN TENSIONER -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <span class="comp-code">0082</span>
+      <span class="comp-name">Chain Tensioner</span>
+    </div>
+    <div class="comp-body">
+      <div class="comp-diagram">
+        <svg width="220" height="110" viewBox="0 0 220 110">
+          <rect x="90" y="10" width="40" height="70" rx="5" fill="#fce4ec" stroke="#c62828" stroke-width="2"/>
+          <circle cx="110" cy="70" r="18" fill="#ef9a9a" stroke="#c62828" stroke-width="2"/>
+          <circle cx="110" cy="70" r="6" fill="#c62828"/>
+          <rect x="100" y="8" width="20" height="15" rx="3" fill="#bdbdbd" stroke="#757575" stroke-width="1.5"/>
+          <text x="110" y="45" text-anchor="middle" font-size="8" fill="#c62828">spring-loaded</text>
+          <text x="110" y="55" text-anchor="middle" font-size="8" fill="#c62828">arm</text>
+          <text x="110" y="73" text-anchor="middle" font-size="7" fill="white">pulley</text>
+          <text x="110" y="100" text-anchor="middle" font-size="8" fill="#555">Presses against chain to take up slack</text>
+        </svg>
+      </div>
+      <div class="comp-desc">
+        <p><strong>What it is:</strong> A spring-loaded arm with a small pulley wheel that presses against the chain to keep it taut. Prevents the chain from skipping or derailing when the suspension moves.</p>
+        <p><strong>Identify it:</strong> A pivot arm with a spring inside the pivot and a small toothed pulley at the end. Mounts on a frame tab near the bottom bracket.</p>
+        <p><strong>Setup:</strong> Install with spring in the tensioned position (arm pressing into chain). There should be 5–10mm of chain sag when measured midway between sprockets with the tensioner set. Too tight = chain breakage; too loose = skipping.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIGHTS -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <span class="comp-code">0364 / 0554 / 0361</span>
+      <span class="comp-name">Lights (Head / Tail / Indicators)</span>
+    </div>
+    <div class="comp-body">
+      <div class="comp-diagram">
+        <svg width="220" height="110" viewBox="0 0 220 110">
+          <!-- headlight -->
+          <ellipse cx="55" cy="55" rx="40" ry="30" fill="#fff9c4" stroke="#f9a825" stroke-width="2"/>
+          <ellipse cx="55" cy="55" rx="20" ry="15" fill="#fff176" stroke="#f9a825" stroke-width="1.5"/>
+          <text x="55" y="95" text-anchor="middle" font-size="8" fill="#f57f17">0364 Headlight</text>
+          <!-- tail -->
+          <ellipse cx="165" cy="55" rx="30" ry="22" fill="#ffcdd2" stroke="#c62828" stroke-width="2"/>
+          <ellipse cx="165" cy="55" rx="14" ry="10" fill="#ef9a9a" stroke="#c62828" stroke-width="1.5"/>
+          <text x="165" y="95" text-anchor="middle" font-size="8" fill="#c62828">0554 Taillight</text>
+          <!-- indicator -->
+          <rect x="95" y="35" width="30" height="20" rx="4" fill="#ffe082" stroke="#f9a825" stroke-width="2"/>
+          <text x="110" y="25" text-anchor="middle" font-size="8" fill="#f57f17">0361</text>
+          <text x="110" y="15" text-anchor="middle" font-size="8" fill="#f57f17">Indicator</text>
+        </svg>
+      </div>
+      <div class="comp-desc">
+        <p><strong>What they are:</strong> The lighting system. The Armadillo has integrated LED lights powered by the main battery.</p>
+        <p><strong>0364 Headlight:</strong> Front-facing white LED. Mounts on the nose of the fairing or front boom. Two-wire connector (red/black).</p>
+        <p><strong>0554 Taillight:</strong> Rear-facing red LED. Mounts at the rear of the frame. Also two-wire.</p>
+        <p><strong>0361 Indicators:</strong> Amber flashing LEDs, one each side front and rear (4 total). Controlled by handlebar-mounted button.</p>
+        <p><strong>Wiring:</strong> All lights connect to the main wiring loom. Follow the colour code — white=headlight, red/amber=indicators. See Wiring Guide section.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- BUMPER -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <span class="comp-code">0574 / 0575</span>
+      <span class="comp-name">Front &amp; Rear Bumpers</span>
+    </div>
+    <div class="comp-body">
+      <div class="comp-diagram">
+        <svg width="220" height="100" viewBox="0 0 220 100">
+          <path d="M 20 50 Q 50 20 110 20 Q 170 20 200 50 Q 170 80 110 80 Q 50 80 20 50 Z" fill="none" stroke="#546e7a" stroke-width="8" stroke-linecap="round"/>
+          <text x="110" y="55" text-anchor="middle" font-size="10" font-weight="bold" fill="#546e7a">BUMPER</text>
+          <line x1="35" y1="35" x2="35" y2="15" stroke="#c62828" stroke-width="1.5"/>
+          <text x="35" y="12" text-anchor="middle" font-size="8" fill="#c62828">M6 bolt ×4</text>
+          <text x="110" y="95" text-anchor="middle" font-size="8" fill="#555">Bolts onto frame nose/tail  |  0574 = front  0575 = rear</text>
+        </svg>
+      </div>
+      <div class="comp-desc">
+        <p><strong>What they are:</strong> Rubber or plastic protective strips that bolt onto the front (0574) and rear (0575) of the frame. They absorb minor impacts and protect the frame from scratches when parking.</p>
+        <p><strong>Installation:</strong> Last step before final checks. 4× M6 bolts per bumper. Tighten to 8 Nm. No thread-lock needed — bumpers may need to be removed for service.</p>
+        <p><strong>Inspect periodically:</strong> If a bumper is cracked or loose, replace it. A missing bumper allows direct frame contact with walls/posts.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- DISC BRAKES -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <span class="comp-code">Tektro Hydraulic Disc</span>
+      <span class="comp-name">Hydraulic Disc Brake System (×4)</span>
+    </div>
+    <div class="comp-body">
+      <div class="comp-diagram">
+        <svg width="220" height="120" viewBox="0 0 220 120">
+          <!-- rotor -->
+          <circle cx="80" cy="60" r="45" fill="none" stroke="#bdbdbd" stroke-width="3"/>
+          <circle cx="80" cy="60" r="25" fill="#e0e0e0" stroke="#9e9e9e" stroke-width="2"/>
+          <!-- caliper -->
+          <rect x="110" y="40" width="35" height="40" rx="4" fill="#546e7a" stroke="#37474f" stroke-width="2"/>
+          <text x="127" y="64" text-anchor="middle" font-size="7" fill="white">CALIPER</text>
+          <!-- hose -->
+          <line x1="140" y1="55" x2="185" y2="30" stroke="#e65100" stroke-width="3"/>
+          <text x="190" y="28" font-size="8" fill="#e65100">hose</text>
+          <text x="80" y="112" text-anchor="middle" font-size="8" fill="#555">MINERAL OIL only — never DOT fluid</text>
+          <text x="80" y="122" text-anchor="middle" font-size="8" fill="#c62828" font-weight="bold">DOT fluid destroys seals!</text>
+        </svg>
+      </div>
+      <div class="comp-desc">
+        <p><strong>What it is:</strong> Hydraulic brakes with a metal rotor bolted to each wheel and a caliper that squeezes brake pads onto the rotor. Operated by levers on the handlebar.</p>
+        <p><strong>Fluid type:</strong> <strong>MINERAL OIL ONLY</strong> — Tektro hydraulic systems use mineral oil, NOT DOT brake fluid. DOT fluid will destroy the seals within hours. The bottle is labelled.</p>
+        <p><strong>Rotor bolt torque:</strong> 4–5 Nm with Loctite 222 (red, weak-strength). The bolts are small — do not overtighten or they will strip.</p>
+        <p><strong>Pad clearance:</strong> 0.2–0.3mm gap each side. Adjust caliper position (loosen the two mounting bolts, centre the caliper, re-tighten).</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEERING ROD -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <span class="comp-code">Steering Rods + Turnbuckle</span>
+      <span class="comp-name">Toe Adjustment Linkage</span>
+    </div>
+    <div class="comp-body">
+      <div class="comp-diagram">
+        <svg width="220" height="100" viewBox="0 0 220 100">
+          <rect x="10" y="45" width="60" height="12" rx="3" fill="#bdbdbd" stroke="#757575" stroke-width="1.5"/>
+          <rect x="150" y="45" width="60" height="12" rx="3" fill="#bdbdbd" stroke="#757575" stroke-width="1.5"/>
+          <!-- turnbuckle -->
+          <rect x="75" y="38" width="70" height="26" rx="5" fill="#ffcc02" stroke="#f57f17" stroke-width="2"/>
+          <text x="110" y="55" text-anchor="middle" font-size="9" font-weight="bold" fill="#f57f17">TURNBUCKLE</text>
+          <line x1="70" y1="51" x2="75" y2="51" stroke="#757575" stroke-width="2"/>
+          <line x1="150" y1="51" x2="145" y2="51" stroke="#757575" stroke-width="2"/>
+          <text x="110" y="85" text-anchor="middle" font-size="8" fill="#555">Rotate barrel to adjust toe-in/toe-out</text>
+          <text x="110" y="97" text-anchor="middle" font-size="8" fill="#555">Lock nuts both ends when alignment is set</text>
+        </svg>
+      </div>
+      <div class="comp-desc">
+        <p><strong>What it is:</strong> The linkage rods that connect the steering rack to each front wheel. The turnbuckle (central barrel with left and right threads) allows you to adjust the length of the rod to set wheel alignment (toe).</p>
+        <p><strong>Identify it:</strong> Two rod ends (ball joints) connected by a threaded barrel. Turning the barrel clockwise lengthens the rod; counter-clockwise shortens it.</p>
+        <p><strong>Toe setting:</strong> Front wheels should be parallel (0mm toe) or very slightly toe-in (1–2mm). Measured between the front edges of the tyres vs rear edges.</p>
+        <p><strong>Lock it:</strong> Once alignment is set, tighten the lock nut hard against the turnbuckle barrel. If the lock nut loosens in use, the wheel alignment drifts and the bike pulls to one side.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION: TOOLS
+═══════════════════════════════════════════════════ -->
+<section id="tools">
+  <h2>Tools You Need</h2>
+  <p>Gather every tool on this list before you start. Stopping mid-build to hunt for a spanner is how parts get lost and mistakes happen.</p>
+
+  <div class="irow" style="flex-wrap:wrap; gap:16px;">
+    <div class="iitem" style="flex:1;min-width:280px;">
+      <h3 style="margin-top:0;color:var(--primary)">Essential (you cannot build without these)</h3>
+      <table class="torque-table">
+        <thead><tr><th>Tool</th><th>Size / Spec</th><th>Used for</th></tr></thead>
+        <tbody>
+          <tr><td>Torque wrench</td><td>5–60 Nm range</td><td>Every critical bolt</td></tr>
+          <tr><td>Allen key set (hex)</td><td>3, 4, 5, 6, 8mm</td><td>Most frame bolts</td></tr>
+          <tr><td>Open-end spanner set</td><td>8, 10, 13, 15, 17mm</td><td>Rod ends, nuts</td></tr>
+          <tr><td>Socket set</td><td>8–19mm + extensions</td><td>Wheel bolts, hubs</td></tr>
+          <tr><td>Bafang BB tool</td><td>Splined cup tool</td><td>Motor installation</td></tr>
+          <tr><td>Chain tool</td><td>Standard bicycle type</td><td>Chain length setting</td></tr>
+          <tr><td>Rohloff sprocket tool</td><td>Rohloff-specific</td><td>40 Nm sprocket torque</td></tr>
+          <tr><td>Rubber mallet</td><td>Any size</td><td>Kingpin, bearings</td></tr>
+          <tr><td>Bench vice</td><td>Min. 100mm jaw</td><td>Pressing bearings</td></tr>
+          <tr><td>Spirit level</td><td>Any, 300mm+</td><td>Front boom alignment</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="iitem" style="flex:1;min-width:280px;">
+      <h3 style="margin-top:0;color:var(--primary)">Useful (saves time)</h3>
+      <table class="torque-table">
+        <thead><tr><th>Tool</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td>Grease gun or syringe</td><td>Applying grease to bearings</td></tr>
+          <tr><td>Needle-nose pliers</td><td>Cable routing, spring clips</td></tr>
+          <tr><td>Cable cutters</td><td>Brake and shift cables</td></tr>
+          <tr><td>Cable crimping tool</td><td>End caps on cables</td></tr>
+          <tr><td>Tape measure</td><td>Wheel alignment measurement</td></tr>
+          <tr><td>Masking tape + marker</td><td>Labelling parts</td></tr>
+          <tr><td>Brake bleed kit</td><td>Tektro mineral oil syringe set</td></tr>
+          <tr><td>Park Tool BBT-XX or equiv.</td><td>Bottom bracket installation</td></tr>
+          <tr><td>Tyre levers (×3)</td><td>Tyre installation</td></tr>
+          <tr><td>Pump with gauge</td><td>Tyre inflation</td></tr>
+          <tr><td>Loctite 222 (red)</td><td>Brake adaptor bolts</td></tr>
+          <tr><td>Loctite 243 (blue)</td><td>Seat rails, general fasteners</td></tr>
+          <tr><td>Copper/anti-seize grease</td><td>Threads, parallel keys</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="warning">⚠️ DO NOT use an impact driver on any bolts in this build. The shock loading can crack aluminium components and strip fine threads. Hand tools only.</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION: TORQUE REFERENCE
+═══════════════════════════════════════════════════ -->
+<section id="torque">
+  <h2>Torque Reference Table</h2>
+  <p>Every torque value in one place. Print this page and tick off values as you go.</p>
+  <table class="torque-table">
+    <thead>
+      <tr><th>Connection</th><th>Bolt Size</th><th>Torque (Nm)</th><th>Thread Lock</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Bafang BB motor (left cup)</td><td>BSA 68/73mm</td><td class="torque-val">17–18 Nm</td><td>None</td><td>Use BB splined cup tool</td></tr>
+      <tr><td>Rohloff sprocket</td><td>M10 left-hand</td><td class="torque-val">40 Nm</td><td>Yes (medium)</td><td>Highest torque in build</td></tr>
+      <tr><td>Wishbone to frame (silent block)</td><td>M8</td><td class="torque-val">25 Nm</td><td>None</td><td>Distance bush MUST be installed</td></tr>
+      <tr><td>Wishbone to frame (M10)</td><td>M10</td><td class="torque-val">35 Nm</td><td>None</td><td>Check distance bush DR10</td></tr>
+      <tr><td>Shock absorber eye bolts</td><td>M8</td><td class="torque-val">25 Nm</td><td>None</td><td>Both upper and lower eyes</td></tr>
+      <tr><td>Kingpin nut (top)</td><td>M12 or M14</td><td class="torque-val">30 Nm</td><td>None</td><td>Grease bearing surfaces first</td></tr>
+      <tr><td>Kingpin nut (bottom)</td><td>M12 or M14</td><td class="torque-val">30 Nm</td><td>None</td><td>Nylon lock nut — new each time</td></tr>
+      <tr><td>Wheel hub nuts</td><td>M10</td><td class="torque-val">35 Nm</td><td>None</td><td>Check Rohloff bayonet engaged</td></tr>
+      <tr><td>Brake rotor bolts (×6)</td><td>M5 Torx T25</td><td class="torque-val">4–5 Nm</td><td>Loctite 222</td><td>Tighten in star pattern</td></tr>
+      <tr><td>Brake caliper mounting bolts</td><td>M6</td><td class="torque-val">8–10 Nm</td><td>Loctite 222</td><td>Check pad alignment before final torque</td></tr>
+      <tr><td>Brake adapter bolts</td><td>M6</td><td class="torque-val">8–10 Nm</td><td>Loctite 222</td><td>Post-mount or flat-mount adapter</td></tr>
+      <tr><td>Front boom clamp</td><td>M6</td><td class="torque-val">8–10 Nm</td><td>None</td><td>Level boom before tightening</td></tr>
+      <tr><td>Seat rail bolts</td><td>M6</td><td class="torque-val">10 Nm</td><td>Loctite 243</td><td>Blue medium-strength</td></tr>
+      <tr><td>Chainring bolts (×5)</td><td>M8</td><td class="torque-val">8–10 Nm</td><td>Loctite 243</td><td>Tighten in star pattern</td></tr>
+      <tr><td>Steering rod lock nuts</td><td>M8</td><td class="torque-val">20 Nm</td><td>None</td><td>After wheel alignment is set</td></tr>
+      <tr><td>Bumper bolts (×4)</td><td>M6</td><td class="torque-val">8 Nm</td><td>None</td><td>No thread lock — removable</td></tr>
+      <tr><td>Idler pulley bolt</td><td>M8</td><td class="torque-val">15 Nm</td><td>None</td><td>Must spin freely after tightening</td></tr>
+      <tr><td>Light mounting bolts</td><td>M5</td><td class="torque-val">3–4 Nm</td><td>None</td><td>Plastic bracket — do not overtighten</td></tr>
+    </tbody>
+  </table>
+  <div class="tip">💡 If you don't have a torque wrench yet, "snug + 1/4 turn" is better than guessing. But buy a torque wrench — incorrect torque is the #1 cause of field failures.</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION: FASTENER GUIDE
+═══════════════════════════════════════════════════ -->
+<section id="fasteners">
+  <h2>Fastener Guide</h2>
+  <p>Bolts, nuts, and washers are not all the same. Here is what you will encounter and how to handle each type.</p>
+
+  <div class="irow" style="flex-wrap:wrap; gap:16px;">
+
+    <div class="iitem" style="min-width:250px;">
+      <svg width="160" height="80" viewBox="0 0 160 80">
+        <polygon points="40,10 80,10 90,30 80,50 40,50 30,30" fill="#ffcc02" stroke="#f57f17" stroke-width="2"/>
+        <rect x="55" y="50" width="10" height="25" fill="#bdbdbd" stroke="#757575" stroke-width="1"/>
+        <text x="80" y="72" text-anchor="middle" font-size="9" fill="#555">standard hex bolt</text>
+      </svg>
+      <p><strong>Standard Hex Bolt</strong> — most common. Turn clockwise to tighten. Use the matching size spanner on the hex head.</p>
+    </div>
+
+    <div class="iitem" style="min-width:250px;">
+      <svg width="160" height="80" viewBox="0 0 160 80">
+        <polygon points="40,10 80,10 90,30 80,50 40,50 30,30" fill="#b0bec5" stroke="#546e7a" stroke-width="2"/>
+        <rect x="55" y="50" width="10" height="25" fill="#bdbdbd" stroke="#757575" stroke-width="1"/>
+        <ellipse cx="83" cy="40" rx="5" ry="7" fill="#546e7a" stroke="#37474f" stroke-width="1"/>
+        <text x="80" y="72" text-anchor="middle" font-size="9" fill="#555">nylon-stop nut</text>
+      </svg>
+      <p><strong>Nylon Stop Nut</strong> — has a nylon ring inside that grips the thread and prevents loosening. <strong>ONE USE ONLY</strong> — once removed, throw it away and use a new one. Never re-use.</p>
+    </div>
+
+    <div class="iitem" style="min-width:250px;">
+      <svg width="160" height="80" viewBox="0 0 160 80">
+        <polygon points="40,10 80,10 90,30 80,50 40,50 30,30" fill="#ef9a9a" stroke="#c62828" stroke-width="2"/>
+        <rect x="55" y="50" width="10" height="25" fill="#bdbdbd" stroke="#757575" stroke-width="1"/>
+        <text x="100" y="28" font-size="8" fill="#c62828">← groove</text>
+        <line x1="90" y1="26" x2="80" y2="26" stroke="#c62828" stroke-width="1"/>
+        <text x="80" y="72" text-anchor="middle" font-size="9" fill="#c62828">LEFT-HAND thread</text>
+      </svg>
+      <p><strong>Left-Hand Thread</strong> — tightens counter-clockwise. Identified by a groove cut into the hex flats. Used on some rod ends (0018) and the Rohloff sprocket. Mark with blue tape!</p>
+    </div>
+
+    <div class="iitem" style="min-width:250px;">
+      <svg width="160" height="80" viewBox="0 0 160 80">
+        <circle cx="80" cy="25" r="20" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/>
+        <circle cx="80" cy="25" r="8" fill="none" stroke="#1565c0" stroke-width="2"/>
+        <text x="80" y="28" text-anchor="middle" font-size="8" fill="#1565c0">flat</text>
+        <text x="80" y="55" text-anchor="middle" font-size="9" fill="#555">flat washer</text>
+        <text x="80" y="68" text-anchor="middle" font-size="8" fill="#555">Spreads bolt load — use under bolt head and nut</text>
+      </svg>
+      <p><strong>Flat Washer</strong> — always use one under the bolt head AND under the nut. Without washers the bolt pulls into the aluminium and loosens over time.</p>
+    </div>
+
+    <div class="iitem" style="min-width:250px;">
+      <svg width="160" height="80" viewBox="0 0 160 80">
+        <circle cx="80" cy="30" r="18" fill="none" stroke="#388e3c" stroke-width="3"/>
+        <path d="M 65 15 Q 80 5 95 15" fill="none" stroke="#388e3c" stroke-width="3"/>
+        <text x="80" y="55" text-anchor="middle" font-size="9" fill="#388e3c">spring washer</text>
+        <text x="80" y="68" text-anchor="middle" font-size="8" fill="#388e3c">Bites into surface, resists vibration loosening</text>
+      </svg>
+      <p><strong>Spring Washer</strong> — slightly dished/split ring. Bites into the bolt and surface to resist vibration. Used on certain frame bolts where no nylon-stop nut is specified.</p>
+    </div>
+
+  </div>
+
+  <h3>Thread-Lock Guide</h3>
+  <div class="irow" style="flex-wrap:wrap; gap:12px;">
+    <div class="iitem" style="min-width:220px; border-left:6px solid #c62828; padding-left:12px;">
+      <strong style="color:#c62828">Loctite 222 (Purple/Red — weak)</strong>
+      <p>Use on: brake rotor bolts, brake adapter bolts, small fasteners (M5 or smaller) where you need easy removal.</p>
+      <p>Cure time: 24 hours full cure, 30 min handling.</p>
+    </div>
+    <div class="iitem" style="min-width:220px; border-left:6px solid #1565c0; padding-left:12px;">
+      <strong style="color:#1565c0">Loctite 243 (Blue — medium)</strong>
+      <p>Use on: seat rail bolts, chainring bolts, Rohloff sprocket, general M6–M10 fasteners.</p>
+      <p>Cure time: 24 hours full cure, 1 hour handling.</p>
+    </div>
+    <div class="iitem" style="min-width:220px; border-left:6px solid #1b5e20; padding-left:12px;">
+      <strong style="color:#1b5e20">No thread-lock</strong>
+      <p>Use on: suspension pivot bolts (nylon-stop nuts instead), wheel axle nuts, bumper bolts (serviceable parts).</p>
+    </div>
+  </div>
+  <div class="warning">⚠️ Apply thread-lock to CLEAN, DRY threads. Grease or oil will prevent it curing. One small drop is enough — a single drop wicked into the thread is sufficient.</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION: PARTS LIST
+═══════════════════════════════════════════════════ -->
+<section id="partslist">
+  <h2>Parts List (Bill of Materials)</h2>
+  <p>Lay all these parts out on a clean workbench before starting. Check each part number against the bag labels. If anything is missing, stop and source it before proceeding.</p>
+  <table class="torque-table">
+    <thead>
+      <tr><th>Code</th><th>Description</th><th>Qty</th><th>Used in Phase</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>0074</td><td>Main Frame (Chassis)</td><td>1</td><td>All</td></tr>
+      <tr><td>0068</td><td>Front Boom (Pedal Tube)</td><td>1</td><td>6</td></tr>
+      <tr><td>0020</td><td>Left Kingpin</td><td>1</td><td>3</td></tr>
+      <tr><td>0021</td><td>Right Kingpin</td><td>1</td><td>3</td></tr>
+      <tr><td>0072</td><td>Front-Left Upper Wishbone</td><td>1</td><td>2</td></tr>
+      <tr><td>0073</td><td>Front-Right Upper Wishbone</td><td>1</td><td>2</td></tr>
+      <tr><td>0075</td><td>Rear-Left Upper Wishbone</td><td>1</td><td>2</td></tr>
+      <tr><td>0076</td><td>Rear-Right Upper Wishbone</td><td>1</td><td>2</td></tr>
+      <tr><td>(lower arms ×4)</td><td>Lower Wishbone Arms</td><td>4</td><td>2</td></tr>
+      <tr><td>0017</td><td>Rod End M10 (suspension)</td><td>8</td><td>2</td></tr>
+      <tr><td>0018</td><td>Rod End M8 Left-Thread (steering)</td><td>2</td><td>3</td></tr>
+      <tr><td>0019</td><td>Rod End M8 Right-Thread (steering)</td><td>2</td><td>3</td></tr>
+      <tr><td>0022</td><td>Bellows (rubber boots)</td><td>12</td><td>2,3</td></tr>
+      <tr><td>DR8</td><td>Distance Bush M8</td><td>8</td><td>2</td></tr>
+      <tr><td>DR10</td><td>Distance Bush M10</td><td>8</td><td>2</td></tr>
+      <tr><td>0026/0027</td><td>Silent Blocks</td><td>8</td><td>2</td></tr>
+      <tr><td>0142</td><td>Shock Absorbers</td><td>4</td><td>2</td></tr>
+      <tr><td>0397</td><td>20" Wheel Rims (Alligt)</td><td>4</td><td>2</td></tr>
+      <tr><td>0015</td><td>Bafang Max 250W Motor</td><td>1</td><td>4</td></tr>
+      <tr><td>0003</td><td>Chainring 42T (front)</td><td>1</td><td>4</td></tr>
+      <tr><td>0013</td><td>Chainring 38T (freewheel)</td><td>1</td><td>4</td></tr>
+      <tr><td>0008</td><td>Freewheel Bearings</td><td>2</td><td>4</td></tr>
+      <tr><td>0069</td><td>Freewheel Axle</td><td>1</td><td>4</td></tr>
+      <tr><td>0088</td><td>Freewheel Housing</td><td>1</td><td>4</td></tr>
+      <tr><td>0082</td><td>Chain Tensioner</td><td>1</td><td>4</td></tr>
+      <tr><td>0006</td><td>Chain Idler Upper</td><td>1</td><td>4</td></tr>
+      <tr><td>0007</td><td>Chain Idler Lower</td><td>1</td><td>4</td></tr>
+      <tr><td>0192</td><td>Cardan Shaft (universal joint)</td><td>2</td><td>4</td></tr>
+      <tr><td>6×6×20mm</td><td>Parallel Keys</td><td>4</td><td>4</td></tr>
+      <tr><td>Rohloff 500/14</td><td>14-Speed Hub</td><td>1</td><td>5</td></tr>
+      <tr><td>Rohloff Shifter</td><td>Twist Grip Shifter</td><td>1</td><td>5</td></tr>
+      <tr><td>Tektro Hydraulic</td><td>Disc Brake Sets</td><td>4</td><td>5</td></tr>
+      <tr><td>(battery)</td><td>Lithium Battery Pack</td><td>1</td><td>6</td></tr>
+      <tr><td>0047</td><td>Battery Mount Bracket</td><td>1</td><td>6</td></tr>
+      <tr><td>0364</td><td>Headlight</td><td>1</td><td>6</td></tr>
+      <tr><td>0554</td><td>Taillight</td><td>1</td><td>6</td></tr>
+      <tr><td>0361</td><td>Indicator Lights</td><td>4</td><td>6</td></tr>
+      <tr><td>0574</td><td>Front Bumper</td><td>1</td><td>6</td></tr>
+      <tr><td>0575</td><td>Rear Bumper</td><td>1</td><td>6</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     PHASE 1: VERIFY & CLEAN
+═══════════════════════════════════════════════════ -->
+<section id="phase1">
+  <h2><span class="phase-badge">Phase 1</span> Verify &amp; Clean All Parts</h2>
+  <div class="time-est">⏱ Estimated time: 1–2 hours</div>
+  <p>This phase has no assembly. Its entire purpose is to prevent expensive mistakes later. Do not skip it.</p>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <h4>Unpack and inventory everything</h4>
+      <div class="parts-needed">
+        <span class="part-pill">Parts list (previous section)</span>
+        <span class="part-pill">Marker pen</span>
+        <span class="part-pill">Masking tape</span>
+      </div>
+      <p>Lay every part out on a large clean surface — a carpet or cardboard sheet protects parts from scratching. Go through the Parts List row by row. Put a tick next to each part as you find it.</p>
+      <p>For matched pairs (left/right wishbones, etc.), label them with masking tape: "FL Upper", "FR Upper", "RL Upper", "RR Upper" and the same for lower arms. Do this NOW while you can tell them apart easily.</p>
+      <div class="why-box"><strong>Why:</strong> A missing part discovered mid-build means disassembly and waiting for parts. Catching it now takes 2 minutes.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <h4>Inspect the main frame for damage</h4>
+      <div class="parts-needed">
+        <span class="part-pill">0074 Main Frame</span>
+        <span class="part-pill">Bright light or torch</span>
+      </div>
+      <p>Examine every weld, tube junction, and hole. Look for:</p>
+      <p>• Cracks in the metal (especially at weld joints)</p>
+      <p>• Bent tubes (sight down each tube like a rifle barrel)</p>
+      <p>• Stripped or cross-threaded bolt holes</p>
+      <p>• Burrs or sharp edges (file smooth if found)</p>
+      <div class="warning">⚠️ If you find any crack, stop. Do not build on a cracked frame. Contact Velove for a replacement.</div>
+      <div class="why-box"><strong>Why:</strong> A damaged frame is invisible inside a finished build and will fail dangerously.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <h4>Clean all threaded holes</h4>
+      <div class="parts-needed">
+        <span class="part-pill">Thread tap set (matching bolt sizes)</span>
+        <span class="part-pill">Wire brush or stiff brush</span>
+        <span class="part-pill">Compressed air (optional)</span>
+      </div>
+      <p>Run a matching tap through every bolt hole in the frame to clear any paint, powder coat, or machining debris from the threads. Even new frames often have partially blocked threads from the coating process.</p>
+      <p>After tapping, blow out or brush out the swarf. A partly blocked thread will make you think a bolt is tight when it isn't — a dangerous false sense of security.</p>
+      <div class="tip">Thread taps can be bought cheaply as a set from any hardware store. You need M5, M6, M8, M10 sizes.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-content">
+      <h4>Press silent blocks into frame</h4>
+      <div class="parts-needed">
+        <span class="part-pill">0026/0027 Silent Blocks (×8)</span>
+        <span class="part-pill">Bench vice or large socket</span>
+        <span class="part-pill">Flat piece of wood (pressing plate)</span>
+      </div>
+      <div class="assembly-order">
+        <div class="ao-step">1. Hold silent block over frame hole — rubber side in</div>
+        <div class="ao-step">2. Press by hand until it starts to enter</div>
+        <div class="ao-step">3. Use vice or socket to push flush</div>
+        <div class="ao-step">4. Check: must be fully seated, flush with frame surface</div>
+      </div>
+      <div class="irow">
+        <div class="iitem">
+          <svg width="160" height="100" viewBox="0 0 160 100">
+            <rect x="40" y="30" width="80" height="40" rx="4" fill="#90a4ae" stroke="#546e7a" stroke-width="2"/>
+            <circle cx="80" cy="50" r="14" fill="white" stroke="#546e7a" stroke-width="2"/>
+            <circle cx="80" cy="50" r="8" fill="#a5d6a7" stroke="#388e3c" stroke-width="2"/>
+            <circle cx="80" cy="50" r="4" fill="#388e3c"/>
+            <text x="80" y="90" text-anchor="middle" font-size="9" fill="#555">Flush with frame face ✓</text>
+          </svg>
+        </div>
+        <div class="iitem">
+          <svg width="160" height="100" viewBox="0 0 160 100">
+            <rect x="40" y="30" width="80" height="40" rx="4" fill="#90a4ae" stroke="#546e7a" stroke-width="2"/>
+            <circle cx="80" cy="40" r="14" fill="#a5d6a7" stroke="#c62828" stroke-width="3"/>
+            <circle cx="80" cy="40" r="4" fill="#388e3c"/>
+            <text x="80" y="90" text-anchor="middle" font-size="9" fill="#c62828">NOT flush = press more ✗</text>
+          </svg>
+        </div>
+      </div>
+      <div class="warning">⚠️ Do not hammer silent blocks directly — use a flat surface or socket to distribute the pressing force evenly or the rubber will tear.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">5</div>
+    <div class="step-content">
+      <h4>Grease all rod end threads</h4>
+      <div class="parts-needed">
+        <span class="part-pill">0017/0018/0019 Rod Ends</span>
+        <span class="part-pill">Copper grease or anti-seize</span>
+      </div>
+      <p>Apply a thin smear of copper grease or anti-seize to the threaded shanks of all rod ends. This prevents thread galling (metal welding together under load) and makes future adjustments possible.</p>
+      <div class="warning">⚠️ Do NOT grease the ball joint portion — grease attracts dirt. Only grease the threaded shank.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     PHASE 2: PRE-ASSEMBLY (SUSPENSION)
+═══════════════════════════════════════════════════ -->
+<section id="phase2">
+  <h2><span class="phase-badge">Phase 2</span> Suspension Pre-Assembly</h2>
+  <div class="time-est">⏱ Estimated time: 3–4 hours</div>
+  <p>Build all four suspension corners: lower wishbones, upper wishbones, and shock absorbers. The bike will not stand on its own wheels until the end of this phase.</p>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <h4>Fit rod ends into wishbone arms</h4>
+      <div class="parts-needed">
+        <span class="part-pill">All 8 wishbone arms</span>
+        <span class="part-pill">0017 Rod Ends (×16)</span>
+        <span class="part-pill">0022 Bellows (×16)</span>
+        <span class="part-pill">Spanner 15mm + 17mm</span>
+      </div>
+      <div class="assembly-order">
+        <div class="ao-step">1. Slide bellow onto rod end shank (through SIDE SLIT, not end hole)</div>
+        <div class="ao-step">2. Screw rod end into wishbone arm end — hand tight first</div>
+        <div class="ao-step">3. Final: two-wrench technique — 25 Nm</div>
+        <div class="ao-step">4. Pull bellow over joint body to cover it</div>
+      </div>
+      <div class="irow">
+        <div class="iitem">
+          <svg width="200" height="110" viewBox="0 0 200 110">
+            <rect x="10" y="50" width="80" height="15" rx="4" fill="#bdbdbd" stroke="#616161" stroke-width="2"/>
+            <circle cx="100" cy="57" r="18" fill="#fff9c4" stroke="#f9a825" stroke-width="2"/>
+            <circle cx="100" cy="57" r="7" fill="#f9a825"/>
+            <rect x="118" y="52" width="65" height="10" rx="3" fill="#bdbdbd" stroke="#616161" stroke-width="1.5"/>
+            <!-- bellow -->
+            <path d="M 115 45 Q 125 38 135 45 Q 145 38 155 45 L 155 70 Q 145 77 135 70 Q 125 77 115 70 Z" fill="#546e7a" stroke="#37474f" stroke-width="1.5" opacity="0.8"/>
+            <text x="100" y="95" text-anchor="middle" font-size="8" fill="#546e7a">Bellow covers joint body ↑</text>
+            <text x="40" y="38" text-anchor="middle" font-size="8" fill="#555">← arm</text>
+            <text x="165" y="38" text-anchor="middle" font-size="8" fill="#555">shank →</text>
+          </svg>
+        </div>
+        <div class="iitem">
+          <svg width="180" height="110" viewBox="0 0 180 110">
+            <text x="90" y="15" text-anchor="middle" font-size="9" font-weight="bold" fill="#1565c0">TWO-WRENCH TECHNIQUE</text>
+            <rect x="20" y="40" width="60" height="25" rx="3" fill="#ffcc02" stroke="#f57f17" stroke-width="2"/>
+            <text x="50" y="56" text-anchor="middle" font-size="8" fill="#f57f17">HOLD still</text>
+            <rect x="100" y="40" width="60" height="25" rx="3" fill="#a5d6a7" stroke="#388e3c" stroke-width="2"/>
+            <text x="130" y="56" text-anchor="middle" font-size="8" fill="#388e3c">TIGHTEN</text>
+            <path d="M 130 65 Q 145 80 130 90" fill="none" stroke="#388e3c" stroke-width="2" marker-end="url(#a)"/>
+            <text x="90" y="100" text-anchor="middle" font-size="8" fill="#555">One spanner on bolt head, one on nut</text>
+          </svg>
+        </div>
+      </div>
+      <div class="warning">⚠️ The rod end must be installed straight (not cross-threaded). If it requires more than light finger pressure to start, stop — the thread is mis-aligned. Back it out and try again.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <h4>Mount lower wishbones to frame</h4>
+      <div class="parts-needed">
+        <span class="part-pill">4× Lower Wishbone Arms</span>
+        <span class="part-pill">DR10 Distance Bushes (×8)</span>
+        <span class="part-pill">M10 Bolts + Nylon-Stop Nuts</span>
+        <span class="part-pill">Torque wrench</span>
+      </div>
+      <div class="assembly-order">
+        <div class="ao-step">1. Work on ONE corner at a time (e.g., Front-Left first)</div>
+        <div class="ao-step">2. Insert DR10 distance bush into silent block hole</div>
+        <div class="ao-step">3. Align lower wishbone with frame bracket</div>
+        <div class="ao-step">4. Insert M10 bolt through frame → distance bush → wishbone pivot</div>
+        <div class="ao-step">5. Fit NEW nylon-stop nut on other end</div>
+        <div class="ao-step">6. Torque: 35 Nm</div>
+        <div class="ao-step">7. Repeat for all 4 lower arms (front and rear)</div>
+      </div>
+      <div class="tip">Leave the wishbones slightly loose (finger-tight) on BOTH frame pivot bolts until the wheel assembly is also fitted. Tighten to full torque only once all three attachment points are connected. This prevents binding.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <h4>Mount upper wishbones to frame</h4>
+      <div class="parts-needed">
+        <span class="part-pill">4× Upper Wishbone Arms (0072/0073/0075/0076)</span>
+        <span class="part-pill">DR8 Distance Bushes (×8)</span>
+        <span class="part-pill">M8 Bolts + Nylon-Stop Nuts</span>
+      </div>
+      <p>Same procedure as lower wishbones but using M8 hardware and DR8 distance bushes. Upper arms attach to the UPPER frame bracket, directly above the lower arm attachment point.</p>
+      <p>Torque: 25 Nm once all attachments are connected.</p>
+      <div class="warning">⚠️ Upper and lower wishbones are NOT the same length. Upper arms are shorter. If you mix them up, the wheel geometry will be wrong and the suspension will bind.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-content">
+      <h4>Fit wheels to wishbone hubs</h4>
+      <div class="parts-needed">
+        <span class="part-pill">0397 Wheels (×4)</span>
+        <span class="part-pill">Axle bolts M10</span>
+        <span class="part-pill">35 Nm torque wrench</span>
+      </div>
+      <p>Connect the rod end (wheel end of wishbone) to the wheel hub carrier. Insert the hub pivot bolt through upper wishbone rod end → hub carrier → lower wishbone rod end. Fit nylon-stop nuts and torque to 35 Nm.</p>
+      <p>Once the wheel assembly is connected, go back and torque all wishbone frame-pivot bolts (from Steps 2 and 3) to their final values.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">5</div>
+    <div class="step-content">
+      <h4>Install shock absorbers</h4>
+      <div class="parts-needed">
+        <span class="part-pill">0142 Shock Absorbers (×4)</span>
+        <span class="part-pill">M8 Eye Bolts + Nylon-Stop Nuts</span>
+        <span class="part-pill">25 Nm torque wrench</span>
+      </div>
+      <div class="assembly-order">
+        <div class="ao-step">1. Orient shock: damper body UP, piston rod DOWN</div>
+        <div class="ao-step">2. Line up upper eye with frame bracket</div>
+        <div class="ao-step">3. Insert M8 bolt through eye — torque 25 Nm</div>
+        <div class="ao-step">4. Line up lower eye with lower wishbone bracket</div>
+        <div class="ao-step">5. Insert M8 bolt through eye — torque 25 Nm</div>
+        <div class="ao-step">6. Check: shock should compress slightly when you push down on the corner</div>
+      </div>
+      <div class="irow">
+        <div class="iitem">
+          <svg width="120" height="150" viewBox="0 0 120 150">
+            <text x="60" y="15" text-anchor="middle" font-size="9" font-weight="bold" fill="#2e7d32">CORRECT ✓</text>
+            <rect x="50" y="25" width="20" height="100" rx="4" fill="#e0e0e0" stroke="#616161" stroke-width="1.5"/>
+            <circle cx="60" cy="25" r="8" fill="#616161"/>
+            <circle cx="60" cy="125" r="8" fill="#616161"/>
+            <text x="90" y="35" font-size="8" fill="#616161">body UP</text>
+            <text x="90" y="125" font-size="8" fill="#616161">rod DOWN</text>
+            <line x1="80" y1="33" x2="70" y2="33" stroke="#616161" stroke-width="1"/>
+            <line x1="80" y1="123" x2="70" y2="123" stroke="#616161" stroke-width="1"/>
+          </svg>
+        </div>
+        <div class="iitem">
+          <svg width="120" height="150" viewBox="0 0 120 150">
+            <text x="60" y="15" text-anchor="middle" font-size="9" font-weight="bold" fill="#c62828">WRONG ✗</text>
+            <rect x="50" y="25" width="20" height="100" rx="4" fill="#e0e0e0" stroke="#c62828" stroke-width="2"/>
+            <circle cx="60" cy="25" r="8" fill="#c62828"/>
+            <circle cx="60" cy="125" r="8" fill="#c62828"/>
+            <text x="90" y="35" font-size="8" fill="#c62828">rod UP</text>
+            <text x="90" y="125" font-size="8" fill="#c62828">body DOWN</text>
+            <line x1="80" y1="33" x2="70" y2="33" stroke="#c62828" stroke-width="1"/>
+            <line x1="80" y1="123" x2="70" y2="123" stroke="#c62828" stroke-width="1"/>
+            <line x1="30" y1="20" x2="90" y2="140" stroke="#c62828" stroke-width="3" opacity="0.5"/>
+          </svg>
+        </div>
+      </div>
+      <div class="why-box"><strong>Why body-up:</strong> The oil in the damper must be in the lower chamber (around the piston). Inverting it puts oil in the wrong place and the damper becomes a useless air spring.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">6</div>
+    <div class="step-content">
+      <h4>Suspension bounce test</h4>
+      <p>With all four corners assembled, push down firmly on each corner of the bike. The suspension should:</p>
+      <p>✓ Compress smoothly without binding or scraping</p>
+      <p>✓ Rebound slowly (damper doing its job) — NOT spring back instantly</p>
+      <p>✓ Return to the same height each time</p>
+      <p>If a corner binds, check that all wishbone pivot bolts were tightened with the arm in its natural resting position (not twisted). If a corner springs back instantly, the damper may be inverted.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     PHASE 3: KINGPINS & STEERING
+═══════════════════════════════════════════════════ -->
+<section id="phase3">
+  <h2><span class="phase-badge">Phase 3</span> Front Kingpins &amp; Steering</h2>
+  <div class="time-est">⏱ Estimated time: 2–3 hours</div>
+  <p>Install the front wheel steering pivots (kingpins) and connect the steering linkage. After this phase the front wheels will steer.</p>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <h4>Grease and insert kingpins</h4>
+      <div class="parts-needed">
+        <span class="part-pill">0020 Left Kingpin</span>
+        <span class="part-pill">0021 Right Kingpin</span>
+        <span class="part-pill">Bearing grease (lithium-based)</span>
+        <span class="part-pill">Rubber mallet</span>
+      </div>
+      <div class="assembly-order">
+        <div class="ao-step">1. Pack all bearing surfaces with grease — use a finger or brush</div>
+        <div class="ao-step">2. Insert kingpin from TOP into steering knuckle/hub carrier</div>
+        <div class="ao-step">3. Tap gently with rubber mallet to seat through upper bearing</div>
+        <div class="ao-step">4. Continue through lower bearing</div>
+        <div class="ao-step">5. Thread top and bottom nuts — left kingpin uses left-hand thread</div>
+        <div class="ao-step">6. Torque top nut 30 Nm, bottom nut 30 Nm</div>
+        <div class="ao-step">7. Verify: wheel pivots smoothly side-to-side with no stiffness or play</div>
+      </div>
+      <div class="warning">⚠️ 0020 Left Kingpin uses left-hand thread — tighten counter-clockwise. If you force it clockwise you will strip the thread. Verify before applying torque.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <h4>Install steering rack/crossbar</h4>
+      <div class="parts-needed">
+        <span class="part-pill">Steering rack assembly</span>
+        <span class="part-pill">M8 mounting bolts</span>
+      </div>
+      <p>Bolt the central steering rack/crossbar to the frame centre bracket. This is the bar that links the steering input (handlebars) to both front wheels simultaneously. Torque the mounting bolts to 25 Nm.</p>
+      <div class="tip">Centre the rack exactly — there should be equal travel left and right. Measure from the rack centre to each frame side — these distances should be equal (within 2mm).</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <h4>Install steering rod ends (0018 + 0019)</h4>
+      <div class="parts-needed">
+        <span class="part-pill">0018 Rod End M8 Left-thread (×1)</span>
+        <span class="part-pill">0019 Rod End M8 Right-thread (×1)</span>
+        <span class="part-pill">Steering turnbuckle rods (×2)</span>
+        <span class="part-pill">0022 Bellows</span>
+        <span class="part-pill">Two 15mm spanners</span>
+      </div>
+      <p>Screw one rod end into each end of both steering rods. Note: one rod uses 0018 (left-thread) on the rack end and 0019 (right-thread) on the wheel end — this is intentional to allow the turnbuckle to shorten or lengthen the rod by rotating the barrel.</p>
+      <p>Set initial length: screw both rod ends to equal engagement depth (about 15mm each). Full alignment adjustment happens in Phase 5.</p>
+      <div class="warning">⚠️ 0018 tightens counter-clockwise. A groove on the hex flats identifies it. Never mix 0018 and 0019 on the same rod end — one rod needs one of each.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-content">
+      <h4>Connect steering rods to kingpins and rack</h4>
+      <p>Bolt the rod end ball joints to the kingpin steering arm and to the rack. Use M8 bolts with flat washers and nylon-stop nuts. Torque 20 Nm. Leave the turnbuckle lock nuts loose — you will adjust wheel alignment in Phase 5.</p>
+      <div class="tip">After connecting, turn the handlebars full lock left and full lock right. All steering rods should move smoothly without any cable or hose fouling. Trace all cables and hoses now to catch any routing problems early.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     PHASE 4: FREEWHEEL, BAFANG & DRIVETRAIN
+═══════════════════════════════════════════════════ -->
+<section id="phase4">
+  <h2><span class="phase-badge">Phase 4</span> Freewheel, Bafang Motor &amp; Drivetrain</h2>
+  <div class="time-est">⏱ Estimated time: 3–4 hours</div>
+  <p>Install the motor, freewheel, cardan shafts, and chain idlers. After this phase the drivetrain is mechanically complete.</p>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <h4>Pre-assemble the freewheel unit</h4>
+      <div class="parts-needed">
+        <span class="part-pill">0088 Freewheel Housing</span>
+        <span class="part-pill">0008 Bearings (×2)</span>
+        <span class="part-pill">0069 Freewheel Axle</span>
+        <span class="part-pill">Bearing grease</span>
+        <span class="part-pill">Socket matching bearing OD</span>
+        <span class="part-pill">Bench vice</span>
+      </div>
+      <div class="assembly-order">
+        <div class="ao-step">1. Pack both bearings (0008) with grease — work grease between all balls</div>
+        <div class="ao-step">2. Place housing (0088) on the vice jaws, flat side down</div>
+        <div class="ao-step">3. Set first bearing squarely in housing hole — must be perfectly level</div>
+        <div class="ao-step">4. Use socket (same OD as bearing outer race) + vice to press in until flush</div>
+        <div class="ao-step">5. Flip housing — repeat for second bearing on opposite side</div>
+        <div class="ao-step">6. Slide axle (0069) through both bearings</div>
+        <div class="ao-step">7. Fit circlip into axle groove to retain it</div>
+        <div class="ao-step">8. Check: axle should spin smoothly, housing should NOT spin on axle</div>
+      </div>
+      <div class="warning">⚠️ If bearing is pressed in at an angle, it will bind and wear out within weeks. Take your time — get it perfectly level before pressing.</div>
+      <div class="why-box"><strong>Why pre-assemble:</strong> Once the housing is on the bike, you cannot press bearings in square. This must be done on the bench.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <h4>Install Bafang Max motor into front boom</h4>
+      <div class="parts-needed">
+        <span class="part-pill">0015 Bafang Max 250W Motor</span>
+        <span class="part-pill">0068 Front Boom</span>
+        <span class="part-pill">Bafang BB splined cup tool</span>
+        <span class="part-pill">17–18 Nm torque wrench</span>
+        <span class="part-pill">Anti-seize grease (for threads)</span>
+      </div>
+      <div class="assembly-order">
+        <div class="ao-step">1. Clean the BB shell (bottom bracket thread) in the front boom</div>
+        <div class="ao-step">2. Apply thin film of anti-seize to BB thread (NOT the motor itself)</div>
+        <div class="ao-step">3. Thread motor in from the drive side (right side, where chain goes)</div>
+        <div class="ao-step">4. Thread in by hand — if it binds, stop and re-align</div>
+        <div class="ao-step">5. Once fully threaded in, use BB tool to torque: 17–18 Nm</div>
+        <div class="ao-step">6. Route motor cable through boom clamp and out to controller position</div>
+      </div>
+      <div class="irow">
+        <div class="iitem">
+          <svg width="200" height="120" viewBox="0 0 200 120">
+            <rect x="20" y="50" width="100" height="20" rx="6" fill="#a5d6a7" stroke="#2e7d32" stroke-width="2"/>
+            <text x="70" y="63" text-anchor="middle" font-size="8" fill="#2e7d32">FRONT BOOM (0068)</text>
+            <circle cx="145" cy="60" r="30" fill="#e3f2fd" stroke="#1565c0" stroke-width="3"/>
+            <circle cx="145" cy="60" r="12" fill="#1565c0"/>
+            <text x="145" y="64" text-anchor="middle" font-size="7" fill="white">Motor</text>
+            <text x="120" y="105" text-anchor="middle" font-size="8" fill="#1565c0">Drive side (RIGHT) →</text>
+            <text x="60" y="40" text-anchor="middle" font-size="8" fill="#2e7d32">← Non-drive side (cable exits left)</text>
+          </svg>
+        </div>
+      </div>
+      <div class="tip">The motor will only thread in one way — British Standard threading (BSA). If it feels very stiff, check you have the right thread specification for your boom (68mm or 73mm BSA).</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <h4>Install chainring on Bafang motor</h4>
+      <div class="parts-needed">
+        <span class="part-pill">0003 Chainring 42T</span>
+        <span class="part-pill">Chainring bolts (×5)</span>
+        <span class="part-pill">Loctite 243 (blue)</span>
+        <span class="part-pill">8–10 Nm torque wrench</span>
+      </div>
+      <div class="assembly-order">
+        <div class="ao-step">1. Align chainring spider holes with Bafang spider arms</div>
+        <div class="ao-step">2. Apply ONE small drop of Loctite 243 to each bolt thread</div>
+        <div class="ao-step">3. Thread in all 5 bolts by hand before tightening any</div>
+        <div class="ao-step">4. Tighten in STAR PATTERN (like wheel lug nuts) — not around in a circle</div>
+        <div class="ao-step">5. Final torque: 8–10 Nm on each bolt</div>
+        <div class="ao-step">6. Check ring runs true — spin by hand and watch for wobble (max 1mm)</div>
+      </div>
+      <div class="irow">
+        <div class="iitem">
+          <svg width="160" height="160" viewBox="0 0 160 160">
+            <circle cx="80" cy="80" r="60" fill="none" stroke="#ff6f00" stroke-width="3"/>
+            <circle cx="80" cy="80" r="15" fill="#ff6f00" stroke="#e65100" stroke-width="2"/>
+            <!-- 5 bolts, star tightening pattern -->
+            <circle cx="80" cy="25" r="6" fill="#e0e0e0" stroke="#ff6f00" stroke-width="2"/>
+            <circle cx="130" cy="58" r="6" fill="#e0e0e0" stroke="#ff6f00" stroke-width="2"/>
+            <circle cx="110" cy="128" r="6" fill="#e0e0e0" stroke="#ff6f00" stroke-width="2"/>
+            <circle cx="50" cy="128" r="6" fill="#e0e0e0" stroke="#ff6f00" stroke-width="2"/>
+            <circle cx="30" cy="58" r="6" fill="#e0e0e0" stroke="#ff6f00" stroke-width="2"/>
+            <!-- star order arrows -->
+            <text x="80" y="20" text-anchor="middle" font-size="9" font-weight="bold" fill="#c62828">①</text>
+            <text x="138" y="63" font-size="9" font-weight="bold" fill="#c62828">③</text>
+            <text x="110" y="145" text-anchor="middle" font-size="9" font-weight="bold" fill="#c62828">⑤</text>
+            <text x="50" y="145" text-anchor="middle" font-size="9" font-weight="bold" fill="#c62828">④</text>
+            <text x="17" y="63" font-size="9" font-weight="bold" fill="#c62828">②</text>
+            <text x="80" y="155" text-anchor="middle" font-size="8" fill="#555">Tighten in numbered order</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-content">
+      <h4>Install cardan shafts (×2)</h4>
+      <div class="parts-needed">
+        <span class="part-pill">0192 Cardan Shafts (×2)</span>
+        <span class="part-pill">6×6×20mm Parallel Keys (×4)</span>
+        <span class="part-pill">Copper grease</span>
+      </div>
+      <div class="assembly-order">
+        <div class="ao-step">1. FIRST: shake each cardan shaft — verify internal spring is present (slight resistance at joint)</div>
+        <div class="ao-step">2. Clean axle key slots and cardan shaft key slots</div>
+        <div class="ao-step">3. Apply thin grease film to parallel key and both slots</div>
+        <div class="ao-step">4. Press parallel key into AXLE slot — should be snug, not sloppy</div>
+        <div class="ao-step">5. Align cardan shaft key slot with the key on axle</div>
+        <div class="ao-step">6. Push cardan shaft onto axle — key engages in both slots</div>
+        <div class="ao-step">7. Check: shaft should turn with axle, not spin freely on it</div>
+        <div class="ao-step">8. Fit retaining clip (if applicable) to keep shaft on axle</div>
+      </div>
+      <div class="warning">⚠️ NO internal spring = shaft will separate under load causing sudden loss of drive. ALWAYS verify spring before connecting. It's a 30-second check that prevents a dangerous failure.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">5</div>
+    <div class="step-content">
+      <h4>Mount freewheel assembly</h4>
+      <div class="parts-needed">
+        <span class="part-pill">Freewheel assembly (pre-built in Step 1)</span>
+        <span class="part-pill">0013 Chainring 38T</span>
+        <span class="part-pill">Frame mounting bolts</span>
+      </div>
+      <p>Bolt the complete freewheel assembly (housing + axle + bearings) to the frame bracket near the rear of the drivetrain. The 38T chainring (0013) mounts to the freewheel axle using a parallel key, same procedure as the cardan shaft.</p>
+      <p>The cardan shaft then connects the freewheel axle to the Rohloff hub axle (installed in Phase 5). Do not connect the cardan shaft to the Rohloff hub yet.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">6</div>
+    <div class="step-content">
+      <h4>Install chain idler pulleys (0006 + 0007)</h4>
+      <div class="parts-needed">
+        <span class="part-pill">0006 Upper Idler</span>
+        <span class="part-pill">0007 Lower Idler</span>
+        <span class="part-pill">M8 idler bolts</span>
+        <span class="part-pill">15 Nm torque wrench</span>
+      </div>
+      <p>Mount each idler pulley on its frame tab using the M8 bolt. Tighten to 15 Nm. After tightening, spin each idler by hand — it must spin freely. If it binds, back off the bolt slightly. The idler bearing must not be compressed.</p>
+      <div class="tip">The chain will be routed over and under these idlers in Phase 6. For now, just confirm they spin freely and are secure.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">7</div>
+    <div class="step-content">
+      <h4>Install chain tensioner (0082)</h4>
+      <div class="parts-needed">
+        <span class="part-pill">0082 Chain Tensioner</span>
+        <span class="part-pill">M8 mounting bolt</span>
+      </div>
+      <p>Bolt the chain tensioner to the designated frame tab. The spring arm should face toward the chain path (lower section between freewheel and rear chainring). Do not tension against the chain yet — the chain is installed in Phase 6.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     PHASE 5: ROHLOFF, STEERING & BRAKES
+═══════════════════════════════════════════════════ -->
+<section id="phase5">
+  <h2><span class="phase-badge">Phase 5</span> Rohloff Hub, Steering Alignment &amp; Brakes</h2>
+  <div class="time-est">⏱ Estimated time: 3–4 hours</div>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <h4>Install Rohloff hub into rear wheel</h4>
+      <div class="parts-needed">
+        <span class="part-pill">Rohloff Speedhub 500/14</span>
+        <span class="part-pill">Rear wheel (right side, drive side)</span>
+        <span class="part-pill">Rohloff sprocket tool</span>
+        <span class="part-pill">40 Nm torque wrench</span>
+        <span class="part-pill">Thread-lock (medium strength)</span>
+      </div>
+      <div class="assembly-order">
+        <div class="ao-step">1. Mount Rohloff hub into rear right wheel (it is the drive-side wheel)</div>
+        <div class="ao-step">2. Thread sprocket onto hub — it has LEFT-HAND thread (counter-clockwise to tighten)</div>
+        <div class="ao-step">3. Apply thread-lock to sprocket thread before final tightening</div>
+        <div class="ao-step">4. Use Rohloff sprocket tool to torque to 40 Nm</div>
+        <div class="ao-step">5. Engage bayonet axle ends in rear axle slots — twist to lock</div>
+        <div class="ao-step">6. Fit and torque wheel axle nuts: 35 Nm</div>
+      </div>
+      <div class="warning">⚠️ 40 Nm is the highest torque value in this build. Use a proper calibrated torque wrench. Under-torqued sprocket will unscrew in use and destroy the hub threading.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <h4>Connect cardan shaft to Rohloff hub</h4>
+      <p>With the Rohloff hub installed in the wheel and the freewheel assembly already fitted, connect the cardan shaft (0192) between the freewheel axle and the Rohloff hub axle, following the same parallel key procedure used in Phase 4 Step 4.</p>
+      <div class="warning">⚠️ Double-check the internal spring is present in the cardan shaft AGAIN before connecting. It is easy to dislodge the spring when handling the shaft.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <h4>Route and connect Rohloff shift cables</h4>
+      <div class="parts-needed">
+        <span class="part-pill">Rohloff Twist Grip Shifter</span>
+        <span class="part-pill">2× Shift cables (inner wires)</span>
+        <span class="part-pill">2× Cable outer housing</span>
+        <span class="part-pill">Cable end crimps (×4)</span>
+        <span class="part-pill">Cable cutters</span>
+      </div>
+      <div class="assembly-order">
+        <div class="ao-step">1. Mount twist-grip shifter on handlebar — clamp with M3 bolts, torque 3 Nm</div>
+        <div class="ao-step">2. Route cable outer housing from shifter to Rohloff hub (right side panel)</div>
+        <div class="ao-step">3. Rohloff has TWO cable ports — cable 1 (shorter) enters at the top port</div>
+        <div class="ao-step">4. Cable 2 (longer) enters at the lower port</div>
+        <div class="ao-step">5. Thread inner wires through housing and connect to hub bayonet connectors</div>
+        <div class="ao-step">6. Set tension: shift to gear 4 — cable should just be taut with no sag</div>
+        <div class="ao-step">7. Crimp end caps on all cut cable ends</div>
+        <div class="ao-step">8. Test shift through all 14 gears while pedalling slowly</div>
+      </div>
+      <div class="tip">Rohloff uses bayonet connectors for cable attachment — push and twist (like a light bulb). These allow the wheel to be removed without tools. If cables seem too short or long, you can adjust the barrel adjusters on the shifter housing.</div>
+      <div class="warning">⚠️ Cable length matters. Rohloff provides two cables of different lengths. Do not cut them to the same length or the cable routing will be wrong and one gear direction will not function.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-content">
+      <h4>Wheel alignment — set toe</h4>
+      <div class="parts-needed">
+        <span class="part-pill">Tape measure</span>
+        <span class="part-pill">Two straight rulers or lengths of string</span>
+        <span class="part-pill">Steering rod turnbuckles</span>
+        <span class="part-pill">Two 15mm spanners</span>
+      </div>
+      <div class="assembly-order">
+        <div class="ao-step">1. Set steering to straight-ahead (centred)</div>
+        <div class="ao-step">2. Measure FRONT edge tyre-to-tyre distance (both front wheels)</div>
+        <div class="ao-step">3. Measure REAR edge tyre-to-tyre distance (same two wheels)</div>
+        <div class="ao-step">4. Target: front measurement = rear measurement (0mm toe) or front 1–2mm LESS (slight toe-in)</div>
+        <div class="ao-step">5. Adjust: loosen turnbuckle lock nuts → turn barrel to change rod length → re-measure</div>
+        <div class="ao-step">6. Tighten lock nuts to 20 Nm when alignment is correct</div>
+      </div>
+      <div class="irow">
+        <div class="iitem">
+          <svg width="200" height="130" viewBox="0 0 200 130">
+            <text x="100" y="12" text-anchor="middle" font-size="9" font-weight="bold" fill="#2e7d32">TOE-IN (correct) ✓</text>
+            <!-- front wheels -->
+            <rect x="30" y="25" width="15" height="50" rx="3" fill="#616161"/>
+            <rect x="155" y="25" width="15" height="50" rx="3" fill="#616161"/>
+            <!-- toe-in arrows -->
+            <line x1="45" y1="28" x2="75" y2="40" stroke="#2e7d32" stroke-width="2" marker-end="url(#a)"/>
+            <line x1="155" y1="28" x2="125" y2="40" stroke="#2e7d32" stroke-width="2" marker-end="url(#a)"/>
+            <!-- measurements -->
+            <line x1="45" y1="25" x2="155" y2="25" stroke="#c62828" stroke-width="1.5" stroke-dasharray="4,2"/>
+            <text x="100" y="21" text-anchor="middle" font-size="8" fill="#c62828">FRONT: smaller</text>
+            <line x1="45" y1="75" x2="155" y2="75" stroke="#1565c0" stroke-width="1.5" stroke-dasharray="4,2"/>
+            <text x="100" y="88" text-anchor="middle" font-size="8" fill="#1565c0">REAR: larger</text>
+            <text x="100" y="105" text-anchor="middle" font-size="8" fill="#555">Difference: 1–2mm</text>
+            <text x="100" y="118" text-anchor="middle" font-size="8" fill="#555">(front is narrower = toe-in)</text>
+          </svg>
+        </div>
+      </div>
+      <div class="why-box"><strong>Why toe matters:</strong> Incorrect toe causes tyres to scrub sideways while driving, wearing them out in days and making the bike unstable.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">5</div>
+    <div class="step-content">
+      <h4>Install disc brake rotors</h4>
+      <div class="parts-needed">
+        <span class="part-pill">4× Disc rotors</span>
+        <span class="part-pill">Torx T25 key</span>
+        <span class="part-pill">Loctite 222 (red/purple weak)</span>
+        <span class="part-pill">4–5 Nm torque wrench</span>
+      </div>
+      <p>Each rotor has 6 bolts. Apply ONE drop of Loctite 222 to each bolt. Tighten in star pattern (same as chainring — opposite bolts first) to 4–5 Nm. Rotor bolts are SMALL — do not overtighten or they will strip.</p>
+      <div class="tip">After fitting, spin the wheel and look at the rotor edge-on. It should run perfectly true (flat). A wobbling rotor means an undertightened bolt. Re-torque in star pattern.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">6</div>
+    <div class="step-content">
+      <h4>Mount brake calipers</h4>
+      <div class="parts-needed">
+        <span class="part-pill">4× Tektro hydraulic calipers</span>
+        <span class="part-pill">Brake adaptor plates (if required)</span>
+        <span class="part-pill">M6 caliper bolts</span>
+        <span class="part-pill">Loctite 222</span>
+        <span class="part-pill">8–10 Nm torque wrench</span>
+      </div>
+      <div class="assembly-order">
+        <div class="ao-step">1. If adapter plates are needed, mount them first with Loctite 222, torque 8–10 Nm</div>
+        <div class="ao-step">2. Mount caliper loosely on adapter/frame (do not tighten fully yet)</div>
+        <div class="ao-step">3. Insert a folded piece of card between pads to centre caliper over rotor</div>
+        <div class="ao-step">4. Squeeze brake lever firmly to push pads against the card</div>
+        <div class="ao-step">5. While holding lever: tighten caliper bolts to 8–10 Nm</div>
+        <div class="ao-step">6. Release lever, remove card, spin wheel — rotor must clear pads both sides</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">7</div>
+    <div class="step-content">
+      <h4>Connect brake hoses and bleed</h4>
+      <p>Route hydraulic hoses from handlebar levers to each caliper. Secure with all frame clips. Refer to the Brake Bleeding section later in this manual for the full bleeding procedure.</p>
+      <div class="warning">⚠️ Tektro hydraulic brakes use MINERAL OIL only. Never use DOT fluid. Check the bottle label before opening it.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     PHASE 6: FRONT BOOM, CHAIN, BATTERY & FINAL
+═══════════════════════════════════════════════════ -->
+<section id="phase6">
+  <h2><span class="phase-badge">Phase 6</span> Front Boom, Chain, Battery &amp; Final Assembly</h2>
+  <div class="time-est">⏱ Estimated time: 3–5 hours</div>
+  <p>The final phase. After this the bike is rideable. Take extra care — you are now checking everything you built in earlier phases.</p>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <h4>Install and level the front boom (0068)</h4>
+      <div class="parts-needed">
+        <span class="part-pill">0068 Front Boom</span>
+        <span class="part-pill">Spirit level</span>
+        <span class="part-pill">M6 clamp bolt</span>
+        <span class="part-pill">8–10 Nm torque wrench</span>
+      </div>
+      <div class="assembly-order">
+        <div class="ao-step">1. Insert the boom clamp end into the frame socket</div>
+        <div class="ao-step">2. Adjust slide length for rider leg length: sitting in seat, slight knee bend at pedal bottom</div>
+        <div class="ao-step">3. Place spirit level on top of the boom tube — adjust until perfectly horizontal</div>
+        <div class="ao-step">4. Tighten clamp bolt to 8–10 Nm</div>
+        <div class="ao-step">5. Verify boom does not rotate or slide — try to push it by hand</div>
+      </div>
+      <div class="irow">
+        <div class="iitem">
+          <svg width="200" height="90" viewBox="0 0 200 90">
+            <rect x="10" y="40" width="160" height="15" rx="5" fill="#a5d6a7" stroke="#2e7d32" stroke-width="2"/>
+            <!-- spirit level -->
+            <rect x="60" y="28" width="80" height="12" rx="4" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5"/>
+            <circle cx="100" cy="34" r="5" fill="none" stroke="#1565c0" stroke-width="1.5"/>
+            <circle cx="100" cy="34" r="2" fill="#1565c0"/>
+            <text x="100" y="27" text-anchor="middle" font-size="8" fill="#1565c0">spirit level — bubble centred = level ✓</text>
+            <text x="100" y="72" text-anchor="middle" font-size="8" fill="#555">Boom must be horizontal — not tilted up or down</text>
+          </svg>
+        </div>
+      </div>
+      <div class="warning">⚠️ A tilted boom changes the pedalling angle and causes knee strain. Always level it before tightening the clamp.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <h4>Install the main chain (front boom to freewheel)</h4>
+      <div class="parts-needed">
+        <span class="part-pill">Main chain</span>
+        <span class="part-pill">Chain tool</span>
+        <span class="part-pill">Master link</span>
+        <span class="part-pill">Chain length guide (big-big method)</span>
+      </div>
+      <div class="assembly-order">
+        <div class="ao-step">1. Route chain: over 42T front chainring → over upper idler 0006 → under lower idler 0007 → onto 38T freewheel chainring</div>
+        <div class="ao-step">2. Determine chain length (big-big+2 method below)</div>
+        <div class="ao-step">3. Cut chain to correct length using chain tool</div>
+        <div class="ao-step">4. Connect chain with master link — both plates must click fully</div>
+        <div class="ao-step">5. Tension the chain tensioner (0082) against the chain — 5–10mm sag midpoint</div>
+        <div class="ao-step">6. Spin pedals by hand and check: chain stays on sprockets, no rubbing</div>
+      </div>
+      <div class="iitem" style="max-width:400px; margin:12px 0;">
+        <strong>Big-Big+2 Chain Length Method:</strong>
+        <p>1. Without the chain tensioner, wrap the chain around the LARGEST chainring (42T front) and LARGEST rear sprocket simultaneously</p>
+        <p>2. Pull the two ends together until snug</p>
+        <p>3. Add 2 links (= 1 complete link pair = 25.4mm)</p>
+        <p>4. This is the correct chain length</p>
+        <div class="tip">Err on the side of slightly long rather than slightly short. A too-short chain can break the derailleur (or in this case, jam the tensioner).</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <h4>Install second chain (freewheel to Rohloff hub)</h4>
+      <p>This shorter chain connects the 38T freewheel chainring output to the Rohloff hub sprocket. Route it directly between the two sprockets. Set chain length using the same big-big+2 method. Use a second master link to connect.</p>
+      <div class="tip">Spin the rear wheel by hand and pedal slowly (without weight on bike). Watch both chains — they should run smoothly with no chattering or jumping. Any jumping indicates wrong chain length or a stiff link.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-content">
+      <h4>Mount the battery</h4>
+      <div class="parts-needed">
+        <span class="part-pill">Lithium Battery Pack</span>
+        <span class="part-pill">0047 Battery Mount Bracket</span>
+        <span class="part-pill">M6 bolts (×4)</span>
+      </div>
+      <div class="assembly-order">
+        <div class="ao-step">1. Bolt mount bracket (0047) to frame at lowest suitable position — centred left-right</div>
+        <div class="ao-step">2. Slide or clip battery onto bracket — follow Velove's battery mounting direction</div>
+        <div class="ao-step">3. Secure any anti-rattle straps or clamps</div>
+        <div class="ao-step">4. Do NOT connect the power connector yet</div>
+      </div>
+      <div class="warning">⚠️ Keep battery as low as possible. Higher mounting raises the centre of gravity and makes the bike tip more easily in corners.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">5</div>
+    <div class="step-content">
+      <h4>Connect the wiring loom</h4>
+      <div class="parts-needed">
+        <span class="part-pill">All wiring connectors</span>
+        <span class="part-pill">Cable ties</span>
+        <span class="part-pill">Wiring diagram (see Wiring section)</span>
+      </div>
+      <p>Follow the wiring colour code in the Wiring Guide section. Connect motor, display, brake cut-offs, throttle (if fitted), speed sensor, and lights. Secure all cables with cable ties — no cable should hang freely or touch a moving part.</p>
+      <p>Final step: connect the battery power connector (XT60/XT90). Red to red, black to black. You should see the display light up.</p>
+      <div class="warning">⚠️ Never connect power with the motor connectors reversed. Always match colours before connecting. A reversed motor connection will damage the controller immediately.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">6</div>
+    <div class="step-content">
+      <h4>Install lights</h4>
+      <div class="parts-needed">
+        <span class="part-pill">0364 Headlight</span>
+        <span class="part-pill">0554 Taillight</span>
+        <span class="part-pill">0361 Indicators (×4)</span>
+        <span class="part-pill">M5 mounting bolts</span>
+      </div>
+      <p>Mount headlight on the front of the boom or nose. Mount taillight on the rear of the frame. Mount indicators on each side (front-left, front-right, rear-left, rear-right). Connect each to the wiring loom. Torque mounting bolts to 3–4 Nm — plastic brackets crack easily.</p>
+      <p>Turn on the ignition and test each light individually. Verify indicators flash (not stay on). Verify headlight direction is forward (not up into rider's eyes).</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">7</div>
+    <div class="step-content">
+      <h4>Install front and rear bumpers</h4>
+      <div class="parts-needed">
+        <span class="part-pill">0574 Front Bumper</span>
+        <span class="part-pill">0575 Rear Bumper</span>
+        <span class="part-pill">4× M6 bolts per bumper</span>
+        <span class="part-pill">8 Nm torque wrench</span>
+      </div>
+      <p>Bolt front bumper to the nose of the frame. Bolt rear bumper to the tail of the frame. Torque all bolts to 8 Nm. No thread-lock — these are serviceable parts.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">8</div>
+    <div class="step-content">
+      <h4>Final static checks before first power-on</h4>
+      <p>Work through this checklist before riding:</p>
+      <p>✅ All suspension bolts torqued (check with torque wrench)</p>
+      <p>✅ All 4 wheels spin freely by hand without rubbing</p>
+      <p>✅ Brake pads not dragging (spin each wheel — no brake drag)</p>
+      <p>✅ Chain tension correct on both chains (5–10mm sag)</p>
+      <p>✅ All cables and hoses secured and away from moving parts</p>
+      <p>✅ Battery connector secure and waterproof</p>
+      <p>✅ Steering moves smoothly from lock to lock</p>
+      <p>✅ All lights working</p>
+      <p>✅ Tyre pressure correct (check sidewall for rated PSI)</p>
+      <div class="why-box"><strong>Do the bounce test again:</strong> Push down on each corner. All 4 should rebound at the same speed. If one corner is stiff, re-check that wishbone bolt was not overtightened.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION: WIRING GUIDE
+═══════════════════════════════════════════════════ -->
+<section id="wiring">
+  <h2>Wiring Guide</h2>
+  <p>All wiring connections use colour-coded connectors. Match colour to colour every time — never force a mismatched connector.</p>
+
+  <table class="torque-table">
+    <thead>
+      <tr><th>Wire Colour</th><th>Function</th><th>Connects To</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><span style="background:#c62828;color:white;padding:2px 8px;border-radius:3px;">RED</span></td><td>Battery positive (+)</td><td>Battery + → Controller +</td><td>Main power. NEVER connect reversed.</td></tr>
+      <tr><td><span style="background:#212121;color:white;padding:2px 8px;border-radius:3px;">BLACK</span></td><td>Battery negative (–)</td><td>Battery – → Controller –</td><td>Ground/earth.</td></tr>
+      <tr><td><span style="background:#f9a825;color:black;padding:2px 8px;border-radius:3px;">YELLOW</span></td><td>Display / LCD</td><td>Controller → Handlebar display</td><td>Shows speed, battery, assist level.</td></tr>
+      <tr><td><span style="background:#388e3c;color:white;padding:2px 8px;border-radius:3px;">GREEN</span></td><td>Brake cut-off</td><td>Brake levers → Controller</td><td>Cuts motor power when brake is squeezed.</td></tr>
+      <tr><td><span style="background:#1565c0;color:white;padding:2px 8px;border-radius:3px;">BLUE</span></td><td>Throttle (if fitted)</td><td>Throttle grip → Controller</td><td>Not all builds have a throttle.</td></tr>
+      <tr><td><span style="background:#6a1b9a;color:white;padding:2px 8px;border-radius:3px;">PURPLE</span></td><td>Speed sensor</td><td>Wheel magnet → Controller</td><td>Wheel magnet must align with sensor.</td></tr>
+      <tr><td><span style="background:#ffffff;color:#333;border:1px solid #999;padding:2px 8px;border-radius:3px;">WHITE</span></td><td>Headlight</td><td>Controller → Headlight (0364)</td><td>Powered by main battery.</td></tr>
+      <tr><td><span style="background:#ff6f00;color:white;padding:2px 8px;border-radius:3px;">ORANGE</span></td><td>Indicator lights</td><td>Controller → 0361 Indicators</td><td>4 indicators total.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="irow" style="margin-top:20px;">
+    <div class="iitem">
+      <svg width="300" height="200" viewBox="0 0 300 200">
+        <rect x="10" y="80" width="60" height="40" rx="4" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2"/>
+        <text x="40" y="103" text-anchor="middle" font-size="9" fill="#2e7d32">BATTERY</text>
+        <rect x="120" y="70" width="60" height="60" rx="4" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/>
+        <text x="150" y="103" text-anchor="middle" font-size="9" fill="#1565c0">CONTROLLER</text>
+        <rect x="230" y="40" width="60" height="30" rx="4" fill="#fff9c4" stroke="#f9a825" stroke-width="2"/>
+        <text x="260" y="58" text-anchor="middle" font-size="9" fill="#f9a825">DISPLAY</text>
+        <rect x="230" y="80" width="60" height="30" rx="4" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/>
+        <text x="260" y="98" text-anchor="middle" font-size="9" fill="#1565c0">MOTOR</text>
+        <rect x="230" y="120" width="60" height="30" rx="4" fill="#fce4ec" stroke="#c62828" stroke-width="2"/>
+        <text x="260" y="138" text-anchor="middle" font-size="9" fill="#c62828">BRAKES</text>
+        <!-- wires -->
+        <line x1="70" y1="95" x2="120" y2="95" stroke="#c62828" stroke-width="3"/>
+        <line x1="70" y1="105" x2="120" y2="105" stroke="#212121" stroke-width="3"/>
+        <line x1="180" y1="85" x2="230" y2="55" stroke="#f9a825" stroke-width="2"/>
+        <line x1="180" y1="95" x2="230" y2="95" stroke="#1565c0" stroke-width="2"/>
+        <line x1="180" y1="105" x2="230" y2="135" stroke="#388e3c" stroke-width="2"/>
+        <text x="95" y="90" font-size="7" fill="#c62828">+</text>
+        <text x="95" y="108" font-size="7" fill="#212121">–</text>
+      </svg>
+      <p style="font-size:13px;color:#555">Simplified wiring schematic — all connections route through the main controller.</p>
+    </div>
+  </div>
+  <div class="tip">After connecting all wires: power on, select assist level 1, and walk the bike forward. Motor should assist gently. If motor runs backwards or at full power with no input, stop immediately — a connection is reversed.</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION: BRAKE BLEEDING
+═══════════════════════════════════════════════════ -->
+<section id="brakes">
+  <h2>Brake Bleeding (Tektro Hydraulic)</h2>
+  <div class="warning">⚠️ MINERAL OIL ONLY. Never use DOT fluid in Tektro brakes. DOT fluid destroys the seals immediately and the brakes will fail. The bottle will be labelled "Mineral Oil" or "Hydraulic Mineral Oil".</div>
+
+  <h3>What you need</h3>
+  <p>Tektro bleed kit (syringe + tube), Tektro mineral oil, 8mm hex key, flat-head screwdriver, paper towels, latex gloves.</p>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <h4>Prepare the caliper end</h4>
+      <p>Remove wheel. Remove brake pads and insert a bleed block (or folded card) between the pistons to stop them being pushed out. Locate the bleed nipple on the caliper body.</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <h4>Prepare the lever end</h4>
+      <p>Rotate the handlebar so the brake lever reservoir is level (horizontal). Remove the reservoir cover and bleed screw. The reservoir is usually under a rubber cover on the lever body.</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <h4>Fill and push from caliper</h4>
+      <p>Fill a syringe with mineral oil (no air bubbles — tap syringe and push air out first). Attach syringe tube to caliper bleed nipple. Open nipple 1/4 turn. Push oil slowly upward through the hose — air bubbles will rise to the lever reservoir.</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-content">
+      <h4>Watch the reservoir</h4>
+      <p>Continue pushing oil until no more bubbles emerge at the reservoir end. Top up the reservoir as needed — it must not run dry or you pull air back in.</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">5</div>
+    <div class="step-content">
+      <h4>Close and test</h4>
+      <p>Close caliper nipple first (before removing syringe). Replace reservoir cover. Squeeze lever — it should feel firm, not spongy. A spongy lever means air is still in the system — repeat the bleed.</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">6</div>
+    <div class="step-content">
+      <h4>Reinstall pads and wheel</h4>
+      <p>Remove bleed block. Reinstall brake pads (check pad orientation — arrow points in wheel rotation direction). Reinstall wheel. Check pad-to-rotor clearance (0.2–0.3mm each side). Test brake by riding slowly.</p>
+    </div>
+  </div>
+  <div class="tip">Bleed all 4 brakes one at a time. Never leave a brake partially bled overnight — oil will absorb moisture and you'll need to redo it.</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION: TROUBLESHOOTING
+═══════════════════════════════════════════════════ -->
+<section id="troubleshooting">
+  <h2>Troubleshooting Guide</h2>
+  <table class="torque-table">
+    <thead>
+      <tr><th>Symptom</th><th>Likely Cause</th><th>Fix</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Chain skips / jumps</td><td>Chain too long, stiff link, or tensioner not engaged</td><td>Check tensioner spring, find stiff link (bend chain sideways — stiff spots visible), re-measure chain length</td></tr>
+      <tr><td>Suspension binds on compression</td><td>Wishbone pivot bolt overtightened with arm twisted</td><td>Loosen bolt, hold arm in natural position, re-torque</td></tr>
+      <tr><td>Steering pulls to one side</td><td>Wheel toe mis-aligned</td><td>Re-check and adjust turnbuckle alignment (Phase 5 Step 4)</td></tr>
+      <tr><td>Brake lever feels spongy</td><td>Air in hydraulic line</td><td>Re-bleed that brake (see Brake Bleeding section)</td></tr>
+      <tr><td>Motor doesn't assist</td><td>Motor connector loose, brake cut-off active, display error</td><td>Check all connectors, check brake cut-off wires, read display error code</td></tr>
+      <tr><td>Rohloff won't shift to some gears</td><td>Cable tension wrong or cable kinked</td><td>Adjust barrel adjuster on shifter. Check cable routing for sharp bends</td></tr>
+      <tr><td>Clicking from drivetrain</td><td>Loose parallel key or cardan shaft not fully seated</td><td>Remove shaft, check key is engaged in both slots, re-seat shaft</td></tr>
+      <tr><td>Wheel wobbles side to side</td><td>Kingpin loose or bearing worn</td><td>Check kingpin torque (30 Nm), inspect bearing for play</td></tr>
+      <tr><td>Vibration through frame</td><td>Wheel out of balance or silent block failed</td><td>Check silent blocks are still in frame holes, inspect for rubber cracking</td></tr>
+      <tr><td>Motor runs with no pedalling</td><td>Throttle stuck or speed sensor fault</td><td>Check throttle connection, check speed sensor alignment (2–3mm from magnet)</td></tr>
+      <tr><td>Front boom slips under load</td><td>Clamp bolt undertorqued or boom tube wet/oily</td><td>Clean mating surfaces, re-torque clamp to 8–10 Nm. If persists, apply non-permanent thread-lock to clamp bolt</td></tr>
+      <tr><td>Disc brake rubs constantly</td><td>Caliper not centred over rotor</td><td>Loosen caliper bolts, re-centre with card method (Phase 5 Step 6), re-torque</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION: MAINTENANCE
+═══════════════════════════════════════════════════ -->
+<section id="maintenance">
+  <h2>Maintenance Schedule</h2>
+  <p>A well-maintained Armadillo will outlast a poorly-maintained one by years. These are the minimum service intervals.</p>
+
+  <h3>After First 50km (Break-In Service)</h3>
+  <table class="torque-table">
+    <thead><tr><th>Task</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>Re-torque ALL suspension pivot bolts</td><td>New parts bed in and bolts can loosen slightly</td></tr>
+      <tr><td>Re-torque all chainring bolts</td><td>Chain load seats the Loctite fully after first use</td></tr>
+      <tr><td>Check and adjust chain tension</td><td>New chains stretch significantly in first 50km</td></tr>
+      <tr><td>Re-check wheel alignment (toe)</td><td>Steering components settle into position</td></tr>
+      <tr><td>Check brake pad wear</td><td>Pads bed into rotor surface in first few uses</td></tr>
+      <tr><td>Listen for any new noises while riding</td><td>Any click or creak indicates a loose fastener</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Every Month (or 200km)</h3>
+  <table class="torque-table">
+    <thead><tr><th>Task</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Lubricate both chains</td><td>Use wet lube in rain, dry wax lube in dry conditions. Apply, wait 5 min, wipe excess off</td></tr>
+      <tr><td>Check chain stretch</td><td>Use a chain checker tool. Replace at 0.5% wear (0.5mm over 12 links). A worn chain destroys sprockets</td></tr>
+      <tr><td>Check tyre pressure</td><td>Inflate to sidewall rating. Under-inflation causes pinch flats and poor handling</td></tr>
+      <tr><td>Check brake lever feel</td><td>Any sponginess = re-bleed needed</td></tr>
+      <tr><td>Inspect brake pads</td><td>Replace when pad material is under 1mm thick</td></tr>
+      <tr><td>Inspect rod end bellows</td><td>Replace any cracked or missing bellows immediately — exposed ball joints corrode quickly</td></tr>
+      <tr><td>Check all visible bolts for looseness</td><td>Tap each bolt lightly with a spanner — a loose bolt sounds different (hollow)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Every Year (Annual Service)</h3>
+  <table class="torque-table">
+    <thead><tr><th>Task</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Rohloff oil change</td><td>Drain old oil, flush with fresh oil, refill. Rohloff-specific oil only. About 25ml capacity.</td></tr>
+      <tr><td>Re-grease all kingpin bearings</td><td>Disassemble kingpins, clean, re-grease, reassemble</td></tr>
+      <tr><td>Replace hydraulic brake fluid</td><td>Mineral oil absorbs moisture over time, reducing boiling point</td></tr>
+      <tr><td>Inspect cardan shaft universal joints</td><td>Check for play in the cross-joint. Any roughness = replace</td></tr>
+      <tr><td>Inspect silent blocks</td><td>Any cracking or delamination = replace. Failed silent blocks allow metal-to-metal contact</td></tr>
+      <tr><td>Full torque check</td><td>Go through every bolt with a torque wrench against the values in this manual</td></tr>
+      <tr><td>Battery inspection</td><td>Check for swelling, corrosion at terminals, capacity drop (charge fully, measure range)</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION: FINAL CHECKLIST
+═══════════════════════════════════════════════════ -->
+<section id="checklist">
+  <h2>Final Pre-Ride Checklist</h2>
+  <p>Before the very first ride, go through this list top to bottom. Check each item yourself — do not assume it is correct because you remember doing it.</p>
+
+  <div class="irow" style="flex-wrap:wrap; gap:20px;">
+    <div class="iitem" style="flex:1; min-width:280px;">
+      <h3 style="color:var(--primary);margin-top:0;">Suspension &amp; Wheels</h3>
+      <p>☐ All 4 wishbone pivot bolts torqued (M8: 25 Nm, M10: 35 Nm)</p>
+      <p>☐ All 4 shock absorber eye bolts torqued (25 Nm)</p>
+      <p>☐ All 4 wheel axle nuts torqued (35 Nm)</p>
+      <p>☐ All 4 tyres inflated to correct pressure</p>
+      <p>☐ Bounce test: all 4 corners rebound at same speed</p>
+      <p>☐ All 4 wheels spin freely with no binding</p>
+
+      <h3 style="color:var(--primary);">Steering</h3>
+      <p>☐ Kingpin torque (30 Nm each)</p>
+      <p>☐ Steering moves lock-to-lock smoothly</p>
+      <p>☐ Turnbuckle lock nuts tight (20 Nm)</p>
+      <p>☐ Wheel alignment set (0–2mm toe-in)</p>
+
+      <h3 style="color:var(--primary);">Brakes</h3>
+      <p>☐ All 4 brake levers feel firm (not spongy)</p>
+      <p>☐ All 4 rotors clear pads when wheel spins</p>
+      <p>☐ Brake hoses secured with all frame clips</p>
+      <p>☐ Brake cut-off tested (motor stops when lever squeezed)</p>
+    </div>
+    <div class="iitem" style="flex:1; min-width:280px;">
+      <h3 style="color:var(--primary);margin-top:0;">Drivetrain</h3>
+      <p>☐ Both chains correct tension (5–10mm sag)</p>
+      <p>☐ Both chains lubricated</p>
+      <p>☐ Cardan shaft springs present (×2)</p>
+      <p>☐ Rohloff shifts through all 14 gears</p>
+      <p>☐ Chain tensioner engaged</p>
+      <p>☐ Bafang motor cable secure and routed away from chain</p>
+      <p>☐ All chainring bolts tight (8–10 Nm)</p>
+
+      <h3 style="color:var(--primary);">Electrical</h3>
+      <p>☐ Battery connector secure</p>
+      <p>☐ Display powers on and shows correct voltage</p>
+      <p>☐ Motor assists when pedalling (test on assist level 1)</p>
+      <p>☐ All lights working (head, tail, indicators)</p>
+      <p>☐ All cables secured away from wheels and chain</p>
+
+      <h3 style="color:var(--primary);">Final Structural</h3>
+      <p>☐ Front boom level and clamp tight (8–10 Nm)</p>
+      <p>☐ Seat and handlebars at correct position for rider</p>
+      <p>☐ Front and rear bumpers fitted</p>
+      <p>☐ No loose parts or rattles when shaking frame by hand</p>
+    </div>
+  </div>
+
+  <div style="background:#e8f5e9; border:2px solid #2e7d32; border-radius:8px; padding:20px; margin-top:24px; text-align:center;">
+    <p style="font-size:1.3em; font-weight:700; color:#1b5e20; margin:0 0 8px 0;">🎉 All boxes ticked? You are ready to ride!</p>
+    <p style="color:#2e7d32; margin:0;">Start with a slow 500m test ride in a safe area. Check all systems feel correct before riding at speed or on public roads.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     CLOSE
+═══════════════════════════════════════════════════ -->
+</main>
+<footer style="text-align:center; padding:40px 20px; background:#1a1a2e; color:#888; font-size:0.85em;">
+  <p style="color:#ccc; font-size:1em; margin-bottom:4px;">Velove Armadillo Supercycle — DIY Build Manual v3</p>
+  <p>For professional support contact Velove · Always verify torque values against your specific build spec · This manual is for reference only</p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,3856 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Armadillo Supercycle Build Table</title>
+  <style>
+    :root {
+      --bg: #f6f7f8;
+      --panel: #ffffff;
+      --ink: #1d2428;
+      --muted: #617078;
+      --line: #d9e0e4;
+      --accent: #1d7f74;
+      --accent-2: #b15b22;
+      --blue: #245a8d;
+      --danger: #b83232;
+      --shadow: 0 12px 30px rgba(21, 32, 38, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.35;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: rgba(246, 247, 248, 0.94);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(10px);
+    }
+    .wrap { max-width: 1680px; margin: 0 auto; padding: 18px 24px; }
+    .titlebar { display: flex; align-items: start; justify-content: space-between; gap: 16px; }
+    h1 { margin: 0; font-size: 24px; letter-spacing: 0; }
+    .subtitle { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr auto auto auto auto auto auto auto;
+      gap: 10px;
+      margin-top: 14px;
+      align-items: center;
+    }
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 6px;
+      padding: 9px 10px;
+      font: inherit;
+    }
+    textarea { min-height: 92px; resize: vertical; font-family: inherit; }
+    button {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 6px;
+      padding: 9px 12px;
+      font: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    button:hover { border-color: #aab7bd; }
+    .primary { background: var(--accent); color: white; border-color: var(--accent); }
+    .danger { color: var(--danger); }
+    .ghost { background: transparent; }
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 18px;
+      align-items: start;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(120px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .stat {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      box-shadow: var(--shadow);
+    }
+    .stat strong { display: block; font-size: 22px; }
+    .stat span { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .table-shell {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: auto;
+      box-shadow: var(--shadow);
+    }
+    table { width: 100%; border-collapse: collapse; min-width: 1180px; }
+    th, td { vertical-align: top; text-align: left; border-bottom: 1px solid var(--line); padding: 12px; }
+    th {
+      position: sticky;
+      top: 117px;
+      z-index: 4;
+      background: #eef3f4;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #425159;
+    }
+    tr.deleted { opacity: 0.46; background: #f5eeee; }
+    .phase { font-weight: 700; color: var(--blue); min-width: 170px; }
+    .step-title { min-width: 220px; }
+    .step-title strong { display: block; margin-bottom: 4px; }
+    .source { color: var(--muted); font-size: 12px; }
+    ul { margin: 0; padding-left: 18px; }
+    li { margin: 0 0 5px; }
+    .empty { color: var(--muted); font-style: italic; }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: 5px;
+      padding: 1px 6px;
+      border-radius: 999px;
+      border: 1px solid #b7d6d1;
+      color: #0f5d55;
+      background: #eef9f7;
+      font-size: 11px;
+      font-style: normal;
+    }
+    .chip.assembly { border-color: #e3c39d; background: #fff6e8; color: #855019; }
+    .actions { display: flex; gap: 6px; flex-wrap: wrap; min-width: 140px; }
+    aside {
+      position: sticky;
+      top: 116px;
+      display: grid;
+      gap: 14px;
+    }
+    .side-panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+    .side-panel h2 { margin: 0 0 10px; font-size: 16px; }
+    .summary-list, .catalog-list { max-height: 330px; overflow: auto; border-top: 1px solid var(--line); margin-top: 10px; padding-top: 8px; }
+    .catalog-item { padding: 7px 0; border-bottom: 1px solid #eef1f2; }
+    .catalog-item strong { display: block; font-size: 13px; }
+    .catalog-item span { display: block; color: var(--muted); font-size: 12px; }
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      place-items: center;
+      padding: 20px;
+      background: rgba(11, 18, 22, 0.42);
+    }
+    .modal-backdrop.open { display: grid; }
+    .modal {
+      width: min(980px, 100%);
+      max-height: min(900px, 92vh);
+      overflow: auto;
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
+    }
+    .modal header {
+      position: sticky;
+      top: 0;
+      background: #fff;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+    .modal h2 { margin: 0; font-size: 18px; }
+    .modal-body { padding: 16px; display: grid; gap: 12px; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    label { display: grid; gap: 5px; color: var(--muted); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+    label input, label textarea { color: var(--ink); font-size: 14px; font-weight: 400; text-transform: none; letter-spacing: 0; }
+    .modal-footer { padding: 16px; display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--line); }
+    @media (max-width: 1100px) {
+      .layout { grid-template-columns: 1fr; }
+      aside { position: static; }
+      .toolbar { grid-template-columns: 1fr 1fr; }
+      th { top: 169px; }
+    }
+    @media (max-width: 720px) {
+      .wrap { padding: 14px; }
+      .titlebar { display: block; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .toolbar { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="titlebar">
+        <div>
+          <h1 id="appTitle">Armadillo Supercycle Build Table</h1>
+          <p class="subtitle" id="appSubtitle">PDF instructions converted into editable steps, enriched with BOM references from BOM.xlsx.</p>
+        </div>
+      </div>
+      <div class="toolbar">
+        <input id="search" type="search" placeholder="Search steps, parts, screws...">
+        <button id="langToggle" class="primary">FR</button>
+        <button id="addStep">Add step</button>
+        <button id="openDiagrams">Diagrams</button>
+        <button id="showDeleted">Show deleted</button>
+        <button id="exportJson">Export JSON</button>
+        <button id="exportPortable">Portable save</button>
+        <button id="resetData" class="danger">Reset</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="stats" id="stats"></div>
+    <div class="layout">
+      <section class="table-shell">
+        <table>
+          <thead>
+            <tr>
+              <th data-i18n="phase">Phase</th>
+              <th data-i18n="step">Step</th>
+              <th data-i18n="components">Components</th>
+              <th data-i18n="hardware">Screws / fasteners</th>
+              <th data-i18n="consumables">Tools / consumables</th>
+              <th data-i18n="instructions">Instructions</th>
+              <th data-i18n="actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="stepsBody"></tbody>
+        </table>
+      </section>
+
+      <aside>
+        <section class="side-panel">
+          <h2 id="summaryTitle">Active build summary</h2>
+          <div id="summary" class="summary-list"></div>
+        </section>
+        <section class="side-panel">
+          <h2 id="catalogTitle">BOM catalog</h2>
+          <input id="catalogSearch" type="search" placeholder="Search BOM code or name...">
+          <div id="catalog" class="catalog-list"></div>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true">
+    <section class="modal">
+      <header><h2 id="modalTitle">Edit step</h2></header>
+      <form id="stepForm">
+        <div class="modal-body">
+          <div class="form-grid">
+            <label>Phase EN<input name="phaseEn"></label>
+            <label>Phase FR<input name="phaseFr"></label>
+            <label>Step label<input name="step"></label>
+            <label>Source<input name="source"></label>
+            <label>Title EN<input name="titleEn"></label>
+            <label>Title FR<input name="titleFr"></label>
+          </div>
+          <label>Components<textarea name="components"></textarea></label>
+          <label>Screws / fasteners<textarea name="hardware"></textarea></label>
+          <label>Tools / consumables<textarea name="consumables"></textarea></label>
+          <label>Instructions<textarea name="instructions"></textarea></label>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="cancelModal">Cancel</button>
+          <button type="submit" class="primary">Save</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <script src="armadillo_portable_state.js"></script>
+  <script>
+    const INITIAL_STEPS = [
+  {
+    "id": "p1-s1",
+    "phaseEn": "Phase 1 - Verifying and cleaning",
+    "phaseFr": "Phase 1 - Contrôle et nettoyage",
+    "step": "Step 1",
+    "titleEn": "Verifying the parts",
+    "titleFr": "Contrôler les pièces",
+    "source": "PDF p.3",
+    "components": [
+      "1x Main frame (0074)",
+      "1x Lower wishbone rear R (0147)",
+      "1x Lower wishbone rear L (0456)",
+      "1x Lower wishbone front L (0070)",
+      "1x Lower wishbone front R (0454)",
+      "4x Upper wishbone F/R L/R (0146)",
+      "2x Kingpin rear L/R (0071)",
+      "1x Kingpin front left (0072)",
+      "1x Kingpin front right (0073)"
+    ],
+    "hardware": [],
+    "consumables": [
+      "File for steering bearing openings"
+    ],
+    "instructions": [
+      "Check that the parts show no defects and fit properly.",
+      "File and clean the steering bearing areas carefully, with a slight inward angle on the inner edge."
+    ]
+  },
+  {
+    "id": "p2-s7",
+    "phaseEn": "Phase 2 - Pre-assembly and preparing parts",
+    "phaseFr": "Phase 2 - Préassemblage et préparation des pièces",
+    "step": "Step 7",
+    "titleEn": "Preparing varied rod ends for wheel suspension",
+    "titleFr": "Préparer les rotules de suspension",
+    "source": "PDF p.3",
+    "components": [
+      "2x Rod end M8 left thread (0018)",
+      "6x Rod end M8 right thread (0019)",
+      "4x Rod end M10 (0017)",
+      "Bellows for rod end M10 (0021)",
+      "Bellows for rod end M8 (0022)"
+    ],
+    "hardware": [
+      "4x M10 regular nut",
+      "8x M8 regular nuts",
+      "Small tie-wraps 100 mm"
+    ],
+    "consumables": [
+      "Grease",
+      "Brush",
+      "Workbench vise",
+      "Nose pliers",
+      "Paper for cleaning"
+    ],
+    "instructions": [
+      "Insert each rod end into the side slit of the correct bellow.",
+      "Grease the ball joint generously, clamp it in a vise, pull the bellow over it, then add the correct nut without forcing the rubber.",
+      "Fix the rubber covering with small tie-wraps and check slit alignment."
+    ]
+  },
+  {
+    "id": "p2-s8",
+    "phaseEn": "Phase 2 - Pre-assembly and preparing parts",
+    "phaseFr": "Phase 2 - Préassemblage et préparation des pièces",
+    "step": "Step 8",
+    "titleEn": "Steering rod (0055) pre-assembly",
+    "titleFr": "Préassembler les barres de direction (0055)",
+    "source": "PDF p.3",
+    "components": [
+      "2x Rod end M8 left thread (0018)",
+      "2x Rod end M8 right thread (0019)",
+      "2x Steering rod (0055)"
+    ],
+    "hardware": [],
+    "consumables": [],
+    "instructions": [
+      "Screw the joints into their respective places but do not tighten yet."
+    ]
+  },
+  {
+    "id": "p2-s9",
+    "phaseEn": "Phase 2 - Pre-assembly and preparing parts",
+    "phaseFr": "Phase 2 - Préassemblage et préparation des pièces",
+    "step": "Step 9",
+    "titleEn": "Attaching remaining rod ends in correct positions",
+    "titleFr": "Fixer les rotules restantes aux bonnes positions",
+    "source": "PDF p.3-4",
+    "components": [
+      "1x Rod end M8 right thread (0019)",
+      "Rear kingpin"
+    ],
+    "hardware": [
+      "M8x40 socket head cap bolt",
+      "2x Distance bushes for RERS2 M8 (0025)",
+      "1x Washer M8 (8.4x16)",
+      "1x Nylon stop nut M8"
+    ],
+    "consumables": [
+      "Screwdriver or needle-nose pliers for alignment"
+    ],
+    "instructions": [
+      "Assemble the rod end and distance bushes, push into place, insert the bolt, finish with washer and nylon stop nut.",
+      "Repeat on the other rear kingpin, mirrored for later alignment."
+    ]
+  },
+  {
+    "id": "p2-s10",
+    "phaseEn": "Phase 2 - Pre-assembly and preparing parts",
+    "phaseFr": "Phase 2 - Préassemblage et préparation des pièces",
+    "step": "Step 10",
+    "titleEn": "Preparing and attaching rod end M10 on rear kingpin",
+    "titleFr": "Préparer et fixer les rotules M10 sur les porte-fusées arrière",
+    "source": "PDF p.4",
+    "components": [
+      "2x Rod end M10 (0017)"
+    ],
+    "hardware": [
+      "2x M10x45 socket head cap bolt",
+      "4x Distance bushes for RERS2 M10 (0024)",
+      "Optional: 4x washers M10 [10.5x20]",
+      "Optional: 2x nylon stop nut M10"
+    ],
+    "consumables": [],
+    "instructions": [
+      "Insert and align bolt and spacer washers into the ball-joint cover.",
+      "Screw bolt into rear kingpin at 20 Nm, then repeat on the other side."
+    ]
+  },
+  {
+    "id": "p2-s11",
+    "phaseEn": "Phase 2 - Pre-assembly and preparing parts",
+    "phaseFr": "Phase 2 - Préassemblage et préparation des pièces",
+    "step": "Step 11",
+    "titleEn": "Attaching rod end M8 to front upper wishbones",
+    "titleFr": "Fixer les rotules M8 sur les triangles supérieurs avant",
+    "source": "PDF p.4",
+    "components": [
+      "Slide bearings black PA (0179)",
+      "Front upper wishbones",
+      "Rod end M8"
+    ],
+    "hardware": [
+      "1x Nylon stop nut M8 per upper wishbone prep",
+      "2x M8 washer per upper wishbone prep",
+      "M8x40 bolt for front kingpin attachment",
+      "1x Washer M8",
+      "2x Distance bushes",
+      "1x Nylon stop nut"
+    ],
+    "consumables": [],
+    "instructions": [
+      "Fit black PA slide bearings into all upper wishbones for later main frame attachment.",
+      "Fix rod ends to upper wishbones with washers and nut, leaving loose for handling.",
+      "Prepare front kingpin attachment parts and leave loose."
+    ]
+  },
+  {
+    "id": "p2-s12",
+    "phaseEn": "Phase 2 - Pre-assembly and preparing parts",
+    "phaseFr": "Phase 2 - Préassemblage et préparation des pièces",
+    "step": "Step 12",
+    "titleEn": "Inserting steer bearings",
+    "titleFr": "Insérer les roulements de direction",
+    "source": "PDF p.4",
+    "components": [
+      "4x Bearing steering rod (0141)"
+    ],
+    "hardware": [],
+    "consumables": [
+      "Rubber mallet"
+    ],
+    "instructions": [
+      "Insert bearings straight into the cleaned steering bearing holes.",
+      "Tap into place if fit is tight; keep aside if a bearing falls out for later handling."
+    ]
+  },
+  {
+    "id": "p2-s13",
+    "phaseEn": "Phase 2 - Pre-assembly and preparing parts",
+    "phaseFr": "Phase 2 - Préassemblage et préparation des pièces",
+    "step": "Step 13",
+    "titleEn": "Build seat slider",
+    "titleFr": "Assembler le coulisseau de siège",
+    "source": "PDF p.4-5",
+    "components": [
+      "2x Seat slide profile (0033)",
+      "4x Seat slide bearing (0032)",
+      "1x Slide stopper right (0416)",
+      "1x Slide stopper left (0415)",
+      "1x Seat adjust handle bar (0060)",
+      "1x Seat adjust handle grip (0061)",
+      "1x Connector block for seat adjust handle bar (0076)",
+      "2x Connector blocks for seat stop (0075)",
+      "2x Seat connector block (0086)",
+      "1x Seat rear support bracket (0048)",
+      "2x Seat connection aluminum L-profile (0407)",
+      "2x Extension spring for handle (0010)",
+      "2x Stop ring for extension spring (0417)",
+      "2x Slide bearing for seat connector block stop",
+      "Optional: 2x Rod for slide stopper (0059)"
+    ],
+    "hardware": [
+      "4x M8x35",
+      "8x M8x16 bolt",
+      "5x M8x16 countersunk torque screws",
+      "2x Washers M8x24"
+    ],
+    "consumables": [
+      "Weak Loctite",
+      "Vise"
+    ],
+    "instructions": [
+      "Use weak Loctite on every bolt.",
+      "Square the slide stoppers to 90 degrees and compress the plastic slide bearing with a vise."
+    ]
+  },
+  {
+    "id": "p2-s14-1",
+    "phaseEn": "Phase 2 - Pre-assembly and preparing parts",
+    "phaseFr": "Phase 2 - Préassemblage et préparation des pièces",
+    "step": "Step 14.1",
+    "titleEn": "Fixing handle bar to slide",
+    "titleFr": "Fixer la poignée au coulisseau",
+    "source": "PDF p.5",
+    "components": [],
+    "hardware": [],
+    "consumables": [],
+    "instructions": [
+      "No material list was present in the source PDF."
+    ]
+  },
+  {
+    "id": "p2-s14-2",
+    "phaseEn": "Phase 2 - Pre-assembly and preparing parts",
+    "phaseFr": "Phase 2 - Préassemblage et préparation des pièces",
+    "step": "Step 14.2",
+    "titleEn": "Extension spring for handle installing",
+    "titleFr": "Installer les ressorts d’extension de poignée",
+    "source": "PDF p.5",
+    "components": [
+      "2x Extension ring",
+      "2x Key ring for closing (not mounted)"
+    ],
+    "hardware": [
+      "2x M4x20 countersunk",
+      "4x Nylon stop nut M4"
+    ],
+    "consumables": [],
+    "instructions": [
+      "Assembly order: M4 countersunk, nylon stop nut, spring, nylon stop nut.",
+      "Pull through the pre-cut top holes and attach the ring to spring ends."
+    ]
+  },
+  {
+    "id": "p2-s15",
+    "phaseEn": "Phase 2 - Pre-assembly and preparing parts",
+    "phaseFr": "Phase 2 - Préassemblage et préparation des pièces",
+    "step": "Step 15",
+    "titleEn": "Lifting the bike on the struts",
+    "titleFr": "Lever le cadre sur les supports",
+    "source": "PDF p.5",
+    "components": [],
+    "hardware": [
+      "2x M6x40 bolt",
+      "2x Washer 6 (6.4x12)",
+      "2x Thick washer (6.4x17 KVP)",
+      "2x Nylon stop nut M6"
+    ],
+    "consumables": [],
+    "instructions": [
+      "Fasten with two M6 bolts diagonally relative to the chaintube position.",
+      "Fasten the bike to the back strut first, then the front."
+    ]
+  },
+  {
+    "id": "p3-s1",
+    "phaseEn": "Phase 3 - Assembling front kingpins and steering",
+    "phaseFr": "Phase 3 - Assemblage des porte-fusées avant et de la direction",
+    "step": "Step 1",
+    "titleEn": "Installing steering lower end and preparing",
+    "titleFr": "Installer la partie basse de direction",
+    "source": "PDF p.5",
+    "components": [
+      "2x Steering head (0044)",
+      "2x Steering head top cap (0064)",
+      "2x Steering head bottom cap (0181)",
+      "2x Steering arm (0065)",
+      "1x Steering arm connector bar (0066)",
+      "2x Bearings for steering arm (0028)",
+      "2x Retaining rings for steering arm (0140)"
+    ],
+    "hardware": [
+      "2x M6x12 countersunk screw"
+    ],
+    "consumables": [
+      "Grease if needed",
+      "Retaining ring pliers"
+    ],
+    "instructions": [
+      "Install bearings in the steering arm connector and lock with retaining rings.",
+      "Push steering heads through from the top, add caps, install steering arm and bottom cap loosely."
+    ]
+  },
+  {
+    "id": "p3-s2",
+    "phaseEn": "Phase 3 - Assembling front kingpins and steering",
+    "phaseFr": "Phase 3 - Assemblage des porte-fusées avant et de la direction",
+    "step": "Step 2",
+    "titleEn": "Install steering arm connector",
+    "titleFr": "Installer la barre de liaison de direction",
+    "source": "PDF p.5",
+    "components": [
+      "Steering rods",
+      "Steering arm connector bar"
+    ],
+    "hardware": [
+      "M8x50 bolt",
+      "Distance bushes M8",
+      "2x Washers M8x16",
+      "1x Nylon stop nut M8"
+    ],
+    "consumables": [],
+    "instructions": [
+      "Fasten steering rods in order: bolt, distance bush, rod end, distance bush, steering arm, two washers, double arm connecting bar, nut."
+    ]
+  },
+  {
+    "id": "p3-s3",
+    "phaseEn": "Phase 3 - Assembling front kingpins and steering",
+    "phaseFr": "Phase 3 - Assemblage des porte-fusées avant et de la direction",
+    "step": "Step 3",
+    "titleEn": "Seat slide profile attachment and slide installment",
+    "titleFr": "Fixer le profil de coulisseau de siège",
+    "source": "PDF p.6",
+    "components": [
+      "Seat slide profile"
+    ],
+    "hardware": [
+      "12x M8x16 bolts"
+    ],
+    "consumables": [
+      "File",
+      "Strong Loctite 243"
+    ],
+    "instructions": [
+      "File down rail on the inside to accommodate the weld, test slide movement, then lock in place."
+    ]
+  },
+  {
+    "id": "p3-s4",
+    "phaseEn": "Phase 3 - Assembling front kingpins and steering",
+    "phaseFr": "Phase 3 - Assemblage des porte-fusées avant et de la direction",
+    "step": "Step 4",
+    "titleEn": "Install spider joint and front suspension sub-assemblies",
+    "titleFr": "Installer les articulations spider et les sous-ensembles avant",
+    "source": "PDF p.6",
+    "components": [
+      "Spider joint",
+      "Front kingpins L/R",
+      "Lower front wishbones",
+      "Front upper wishbones"
+    ],
+    "hardware": [],
+    "consumables": [],
+    "instructions": [
+      "Umbrella step in the PDF. Detailed materials are listed in steps 4.1 to 4.6."
+    ]
+  },
+  {
+    "id": "p3-s4-1",
+    "phaseEn": "Phase 3 - Assembling front kingpins and steering",
+    "phaseFr": "Phase 3 - Assemblage des porte-fusées avant et de la direction",
+    "step": "Step 4.1",
+    "titleEn": "Attach lower front wishbones",
+    "titleFr": "Fixer les triangles inférieurs avant",
+    "source": "PDF p.6",
+    "components": [
+      "Lower front wishbones"
+    ],
+    "hardware": [
+      "2x M8x50 bolts",
+      "2x Washers M8",
+      "2x Nylon stop nut M8"
+    ],
+    "consumables": [],
+    "instructions": [
+      "Install lower wishbone into prepared mounts, push bolt through silent block and tighten."
+    ]
+  },
+  {
+    "id": "p3-s4-2",
+    "phaseEn": "Phase 3 - Assembling front kingpins and steering",
+    "phaseFr": "Phase 3 - Assemblage des porte-fusées avant et de la direction",
+    "step": "Step 4.2",
+    "titleEn": "Attach front kingpins to spider joints",
+    "titleFr": "Fixer les porte-fusées avant aux articulations spider",
+    "source": "PDF p.6",
+    "components": [
+      "Front kingpins",
+      "Spider-joint rod end"
+    ],
+    "hardware": [
+      "2x M10x45",
+      "2x M10 washer",
+      "2x Nylon stop nut M10"
+    ],
+    "consumables": [],
+    "instructions": [
+      "Move kingpin over spider-joint rod end, align, insert M10 bolt and tighten."
+    ]
+  },
+  {
+    "id": "p3-s4-3",
+    "phaseEn": "Phase 3 - Assembling front kingpins and steering",
+    "phaseFr": "Phase 3 - Assemblage des porte-fusées avant et de la direction",
+    "step": "Step 4.3",
+    "titleEn": "Attach upper wishbones to main frame",
+    "titleFr": "Fixer les triangles supérieurs au cadre principal",
+    "source": "PDF p.6",
+    "components": [
+      "Upper wishbones",
+      "Main frame"
+    ],
+    "hardware": [
+      "4x M6x40",
+      "4x M6 washers",
+      "4x Nylon stop nut M6"
+    ],
+    "consumables": [],
+    "instructions": [
+      "Mount upper wishbones into place and insert M6 bolts pointing inward, then fasten."
+    ]
+  },
+  {
+    "id": "p3-s4-4",
+    "phaseEn": "Phase 3 - Assembling front kingpins and steering",
+    "phaseFr": "Phase 3 - Assemblage des porte-fusées avant et de la direction",
+    "step": "Step 4.4",
+    "titleEn": "Attach upper wishbones to front kingpin",
+    "titleFr": "Fixer les triangles supérieurs au porte-fusée avant",
+    "source": "PDF p.6",
+    "components": [
+      "Upper wishbones",
+      "Front kingpin"
+    ],
+    "hardware": [
+      "2x M8x40 bolt",
+      "4x Distance bushes",
+      "2x Washer M8",
+      "2x Nylon stop nut M8"
+    ],
+    "consumables": [],
+    "instructions": [
+      "Join together and tighten accordingly."
+    ]
+  },
+  {
+    "id": "p3-s4-5",
+    "phaseEn": "Phase 3 - Assembling front kingpins and steering",
+    "phaseFr": "Phase 3 - Assemblage des porte-fusées avant et de la direction",
+    "step": "Step 4.5",
+    "titleEn": "Attach steering rod to front kingpins",
+    "titleFr": "Fixer la barre de direction aux porte-fusées avant",
+    "source": "PDF p.6",
+    "components": [
+      "Steering rod",
+      "Front kingpins"
+    ],
+    "hardware": [
+      "2x M8x45 bolt",
+      "4x Distance bushes",
+      "2x Washer M8",
+      "2x Nylon stop nut M8"
+    ],
+    "consumables": [],
+    "instructions": [
+      "Join steering rod to kingpins and tighten accordingly."
+    ]
+  },
+  {
+    "id": "p3-s4-6",
+    "phaseEn": "Phase 3 - Assembling front kingpins and steering",
+    "phaseFr": "Phase 3 - Assemblage des porte-fusées avant et de la direction",
+    "step": "Step 4.6",
+    "titleEn": "Attach brake adapters to front kingpins",
+    "titleFr": "Fixer les adaptateurs de frein aux porte-fusées avant",
+    "source": "PDF p.6",
+    "components": [
+      "3x Brake adapters"
+    ],
+    "hardware": [
+      "6x Brake adapter black bolts with pre-washers"
+    ],
+    "consumables": [
+      "Weak Loctite 222"
+    ],
+    "instructions": [
+      "Install two adapters on front left kingpin and one on front right kingpin."
+    ]
+  },
+  {
+    "id": "p4-s6",
+    "phaseEn": "Phase 4 - Assembling and mounting freewheel and Bafang",
+    "phaseFr": "Phase 4 - Assemblage et montage roue libre / Bafang",
+    "step": "Step 6",
+    "titleEn": "Attach rear upper wishbone to main frame",
+    "titleFr": "Fixer le triangle supérieur arrière au cadre",
+    "source": "PDF p.6-7",
+    "components": [
+      "Rear upper wishbones",
+      "Main frame"
+    ],
+    "hardware": [
+      "4x M6x40",
+      "4x M6 washers",
+      "4x Nylon stop nut M6"
+    ],
+    "consumables": [],
+    "instructions": [
+      "Repeat the front upper wishbone attachment method."
+    ]
+  },
+  {
+    "id": "p4-s7",
+    "phaseEn": "Phase 4 - Assembling and mounting freewheel and Bafang",
+    "phaseFr": "Phase 4 - Assemblage et montage roue libre / Bafang",
+    "step": "Step 7",
+    "titleEn": "Attach lower rear wishbones",
+    "titleFr": "Fixer les triangles inférieurs arrière",
+    "source": "PDF p.7",
+    "components": [
+      "Lower rear wishbones"
+    ],
+    "hardware": [
+      "2x M8x50 bolts",
+      "2x Washers M8",
+      "2x Nylon stop nut M8"
+    ],
+    "consumables": [],
+    "instructions": []
+  },
+  {
+    "id": "p4-s8",
+    "phaseEn": "Phase 4 - Assembling and mounting freewheel and Bafang",
+    "phaseFr": "Phase 4 - Assemblage et montage roue libre / Bafang",
+    "step": "Step 8",
+    "titleEn": "Attach rear kingpins to lower rear wishbones",
+    "titleFr": "Fixer les porte-fusées arrière aux triangles inférieurs arrière",
+    "source": "PDF p.7",
+    "components": [
+      "Rear kingpins",
+      "Lower rear wishbones"
+    ],
+    "hardware": [],
+    "consumables": [],
+    "instructions": [
+      "See pre-assembly if not present. Attach and tighten, but leave loose for cardan axle."
+    ]
+  },
+  {
+    "id": "p4-s11",
+    "phaseEn": "Phase 4 - Assembling and mounting freewheel and Bafang",
+    "phaseFr": "Phase 4 - Assemblage et montage roue libre / Bafang",
+    "step": "Step 11",
+    "titleEn": "Shock absorber installation front and back",
+    "titleFr": "Installer les amortisseurs avant et arrière",
+    "source": "PDF p.7",
+    "components": [
+      "4x Shock absorbers (0142)"
+    ],
+    "hardware": [
+      "8x M8x40 bolt",
+      "8x M8 washers",
+      "8x M8 nylon stop nut"
+    ],
+    "consumables": [
+      "Small Allen key for slit alignment"
+    ],
+    "instructions": [
+      "Install each shock absorber at the correct top holder, then fasten the lower end in the middle hole."
+    ]
+  },
+  {
+    "id": "p4-s12",
+    "phaseEn": "Phase 4 - Assembling and mounting freewheel and Bafang",
+    "phaseFr": "Phase 4 - Assemblage et montage roue libre / Bafang",
+    "step": "Step 12",
+    "titleEn": "Installing rear axle and fastening rear kingpin",
+    "titleFr": "Installer l’axe arrière et fixer le porte-fusée arrière",
+    "source": "PDF p.7",
+    "components": [
+      "2x Rear wheel axle (0310)",
+      "2x Cross Cardan Shaft (0192)",
+      "4x Parallel Key 6x6x20 (0091)"
+    ],
+    "hardware": [
+      "4x M8 washers",
+      "2x Nylon stop nuts"
+    ],
+    "consumables": [
+      "Axle grease (C0012)",
+      "Standard grease (C0013)"
+    ],
+    "instructions": [
+      "Align freewheel sprocket with Rohloff sprocket and fasten freewheel with bearing small screws.",
+      "Grease and insert keys/axles, tap cardan shaft into place, reconnect while inserting top rod end into upper wishbone."
+    ]
+  },
+  {
+    "id": "p4-s14",
+    "phaseEn": "Phase 4 - Assembling and mounting freewheel and Bafang",
+    "phaseFr": "Phase 4 - Assemblage et montage roue libre / Bafang",
+    "step": "Step 14",
+    "titleEn": "Attach brake adapters to rear kingpins",
+    "titleFr": "Fixer les adaptateurs de frein aux porte-fusées arrière",
+    "source": "PDF p.7",
+    "components": [
+      "2x IS brake adapter (0461)"
+    ],
+    "hardware": [
+      "4x Brake adapter black bolts with pre-washers"
+    ],
+    "consumables": [
+      "Weak Loctite 222"
+    ],
+    "instructions": [
+      "Install adapters on rear kingpins, facing back."
+    ]
+  },
+  {
+    "id": "p5-s1",
+    "phaseEn": "Phase 5 - Rohloff, steering, brakes and wheel alignment",
+    "phaseFr": "Phase 5 - Rohloff, direction, freins et alignement des roues",
+    "step": "Step 1",
+    "titleEn": "Install steer handles",
+    "titleFr": "Installer les poignées de direction",
+    "source": "PDF p.7-8",
+    "components": [
+      "2x Steering handle bars (0462)"
+    ],
+    "hardware": [
+      "8x M6x20"
+    ],
+    "consumables": [
+      "Tube for alignment",
+      "Weak Loctite"
+    ],
+    "instructions": [
+      "Use a tube to align both steering heads and align the middle hole with the bike frame.",
+      "Use M6x20 bolts to fix heads and handle bars gently and evenly."
+    ]
+  },
+  {
+    "id": "p5-s3",
+    "phaseEn": "Phase 5 - Rohloff, steering, brakes and wheel alignment",
+    "phaseFr": "Phase 5 - Rohloff, direction, freins et alignement des roues",
+    "step": "Step 3",
+    "titleEn": "Installing mudguard holders",
+    "titleFr": "Installer les supports de garde-boue",
+    "source": "PDF p.8",
+    "components": [
+      "12x Mudguard holder (0045)"
+    ],
+    "hardware": [
+      "24x M5x20",
+      "16x M5 nylon stop nuts",
+      "16x M5 washers"
+    ],
+    "consumables": [
+      "Weak Loctite"
+    ],
+    "instructions": [
+      "Screw top holders in place using weak Loctite but no washer.",
+      "Attach other holders with nut and washers, bolt pointing inward."
+    ]
+  },
+  {
+    "id": "p5-s4",
+    "phaseEn": "Phase 5 - Rohloff, steering, brakes and wheel alignment",
+    "phaseFr": "Phase 5 - Rohloff, direction, freins et alignement des roues",
+    "step": "Step 4",
+    "titleEn": "Preparing disc brakes",
+    "titleFr": "Préparer les freins à disque",
+    "source": "PDF p.8",
+    "components": [
+      "4x Brake disc (0470)",
+      "4x Samagaga wheelhub (0077)"
+    ],
+    "hardware": [
+      "24x Brake disc bolts M5x10 mm included with disc brakes (0187)"
+    ],
+    "consumables": [
+      "Weak Loctite"
+    ],
+    "instructions": [
+      "Screw disc brakes onto wheel holders mirrored left/right, respecting drive direction.",
+      "Torque to 6 Nm and avoid touching disc outer edge with bare hands or grease."
+    ]
+  },
+  {
+    "id": "p5-s5",
+    "phaseEn": "Phase 5 - Rohloff, steering, brakes and wheel alignment",
+    "phaseFr": "Phase 5 - Rohloff, direction, freins et alignement des roues",
+    "step": "Step 5",
+    "titleEn": "Installing disc brakes on main frame",
+    "titleFr": "Installer les disques de frein sur le cadre",
+    "source": "PDF p.8",
+    "components": [
+      "2x Front wheel axles (0057)",
+      "2x Parallel keys",
+      "2x Front kingpin back cover (xxxx)"
+    ],
+    "hardware": [
+      "4x Stop screw hex M5x8"
+    ],
+    "consumables": [
+      "Grease"
+    ],
+    "instructions": [
+      "Grease axle, slide disc brake tightly, and fix with stop screw.",
+      "Use a wheel to get the disc brake close and tight before fixing the stop screw."
+    ]
+  },
+  {
+    "id": "p5-s6",
+    "phaseEn": "Phase 5 - Rohloff, steering, brakes and wheel alignment",
+    "phaseFr": "Phase 5 - Rohloff, direction, freins et alignement des roues",
+    "step": "Step 6",
+    "titleEn": "Installing and adjusting brake systems",
+    "titleFr": "Installer et régler les systèmes de freinage",
+    "source": "PDF p.8",
+    "components": [
+      "2x Front brakes (0404)",
+      "2x Back brakes (0376)",
+      "7x P-clips"
+    ],
+    "hardware": [
+      "1x 2 cm screw 4.2 mm",
+      "6x 1 cm screw 4.2 mm"
+    ],
+    "consumables": [
+      "Cable ties"
+    ],
+    "instructions": [
+      "Align and fix disc brakes on the discs.",
+      "Pull cable through middle of bike frame and attach using the pre-drilled smaller holes, then adjust per Tektro specifications."
+    ]
+  },
+  {
+    "id": "p5-s7",
+    "phaseEn": "Phase 5 - Rohloff, steering, brakes and wheel alignment",
+    "phaseFr": "Phase 5 - Rohloff, direction, freins et alignement des roues",
+    "step": "Step 7",
+    "titleEn": "Making the wheels",
+    "titleFr": "Assembler les roues",
+    "source": "PDF p.9",
+    "components": [
+      "4x Inner tubes 20 in 40/62-400 (0176)",
+      "4x Marathon Plus 20 in tire (0177)",
+      "4x Alligt wheel (0397)",
+      "4x Air valve rings (xxxx)",
+      "4x Air valve caps (xxxx)"
+    ],
+    "hardware": [],
+    "consumables": [],
+    "instructions": [
+      "Install tubes and tires on wheel hub to standard specifications, max 5 bar."
+    ]
+  },
+  {
+    "id": "p5-s8",
+    "phaseEn": "Phase 5 - Rohloff, steering, brakes and wheel alignment",
+    "phaseFr": "Phase 5 - Rohloff, direction, freins et alignement des roues",
+    "step": "Step 8",
+    "titleEn": "Aligning wheels",
+    "titleFr": "Aligner les roues",
+    "source": "PDF p.9",
+    "components": [
+      "Aligning tools",
+      "1x Rod to keep steering heads in place",
+      "4x Wheel caps"
+    ],
+    "hardware": [
+      "4x Wedge lock washers HLS 10",
+      "4x M10x30"
+    ],
+    "consumables": [],
+    "instructions": [
+      "Align using custom tools, fasten wheels loosely, and tighten at the end."
+    ]
+  },
+  {
+    "id": "p6-s10",
+    "phaseEn": "Phase 6 - Front boom, main chain, batteries and test drive",
+    "phaseFr": "Phase 6 - Potence avant, chaîne principale, batteries et essai",
+    "step": "Step 10",
+    "titleEn": "Making and installing the seat",
+    "titleFr": "Assembler et installer le siège",
+    "source": "PDF p.9",
+    "components": [
+      "1x Seat holder back bar",
+      "1x Seat support bar front",
+      "1x Seat",
+      "1x Seat cushion",
+      "2x Seat slide-connectors"
+    ],
+    "hardware": [
+      "1x M6x55 socket head cap bolt",
+      "1x M6 washer",
+      "1x Nylon stop M6 nut",
+      "2x Countersunk screw M6x12",
+      "4x M6x12 bolt"
+    ],
+    "consumables": [
+      "Double-sided tape",
+      "Weak Loctite"
+    ],
+    "instructions": [
+      "Fasten rear support bar, front support bar, mount seat on slider, fix seat slide connectors, then tape cushion to seat."
+    ]
+  },
+  {
+    "id": "p6-s13",
+    "phaseEn": "Phase 6 - Front boom, main chain, batteries and test drive",
+    "phaseFr": "Phase 6 - Potence avant, chaîne principale, batteries et essai",
+    "step": "Step 13",
+    "titleEn": "Moulding the mudguard using heat gun",
+    "titleFr": "Former les garde-boue au décapeur thermique",
+    "source": "PDF p.9",
+    "components": [
+      "4x Mudguards"
+    ],
+    "hardware": [],
+    "consumables": [
+      "Heat gun",
+      "Round mallet"
+    ],
+    "instructions": [
+      "Mould carefully without burning plastic; mount or skip for shipping."
+    ]
+  },
+  {
+    "id": "p6-s15",
+    "phaseEn": "Phase 6 - Front boom, main chain, batteries and test drive",
+    "phaseFr": "Phase 6 - Potence avant, chaîne principale, batteries et essai",
+    "step": "Step 15",
+    "titleEn": "Installing mirrors and preparing handles",
+    "titleFr": "Installer les rétroviseurs et préparer les poignées",
+    "source": "PDF p.9-10",
+    "components": [
+      "2x Mirrors",
+      "2x Rubber handles",
+      "1x Rohloff adapter tube",
+      "1x Left hand adapter tube"
+    ],
+    "hardware": [],
+    "consumables": [
+      "Warm water",
+      "Grease"
+    ],
+    "instructions": [
+      "Warm rubber handles, slide over adapter tubes and steering handles.",
+      "Align left mirror, mark and cut groove for indicator lights, then fasten in place."
+    ]
+  },
+  {
+    "id": "p6-s16",
+    "phaseEn": "Phase 6 - Front boom, main chain, batteries and test drive",
+    "phaseFr": "Phase 6 - Potence avant, chaîne principale, batteries et essai",
+    "step": "Step 16",
+    "titleEn": "Installation of mudguards",
+    "titleFr": "Installer les garde-boue",
+    "source": "PDF p.10",
+    "components": [
+      "Reshaped mudguards"
+    ],
+    "hardware": [
+      "24x M5x16",
+      "24x M5 washers (5.3x15)",
+      "24x M5 nylon stop nuts"
+    ],
+    "consumables": [],
+    "instructions": [
+      "Place each reshaped mudguard over axle and brakes, attach and tighten.",
+      "Leave front-left mudguard unattached for parking brake installation."
+    ]
+  }
+];
+    const BOM_CATALOG = [
+  {
+    "code": "0001",
+    "name": "Chain guard, Black ABS",
+    "ref": "90.0002.19",
+    "vendor": "Your Plastic Solutions",
+    "source": "part"
+  },
+  {
+    "code": "0003",
+    "name": "Chainring Left 42T",
+    "ref": "116215197000",
+    "vendor": "Cycle Service Nordic",
+    "source": "part"
+  },
+  {
+    "code": "0005",
+    "name": "Motor Chainring Guard",
+    "ref": "",
+    "vendor": "B&K Precision Machining",
+    "source": "part"
+  },
+  {
+    "code": "0006",
+    "name": "Chain idler, large",
+    "ref": "Chain Idler 100mm ax10",
+    "vendor": "Alligt",
+    "source": "part"
+  },
+  {
+    "code": "0007",
+    "name": "Chain idler, small",
+    "ref": "Chain Idler 68 mm 15T",
+    "vendor": "Alligt",
+    "source": "part"
+  },
+  {
+    "code": "0008",
+    "name": "Bearing Freewheel",
+    "ref": "",
+    "vendor": "EIE",
+    "source": "part"
+  },
+  {
+    "code": "0010",
+    "name": "Extension Spring for Handle",
+    "ref": "",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0013",
+    "name": "Bafang Chain Ring (38T)",
+    "ref": "",
+    "vendor": "Suzhou Bafang Electric Motor Science-Technology",
+    "source": "part"
+  },
+  {
+    "code": "0015",
+    "name": "Motorunit Bafang Max",
+    "ref": "",
+    "vendor": "Suzhou Bafang Electric Motor Science-Technology",
+    "source": "part"
+  },
+  {
+    "code": "0017",
+    "name": "Rod end, M10",
+    "ref": "HCGKAW10",
+    "vendor": "Fluro-gelenklager GmbH",
+    "source": "part"
+  },
+  {
+    "code": "0018",
+    "name": "Rod end, M8 left thread",
+    "ref": "HCGKLAW08",
+    "vendor": "Fluro-gelenklager GmbH",
+    "source": "part"
+  },
+  {
+    "code": "0019",
+    "name": "Rod end, M8 right thread",
+    "ref": "HCGKAW08",
+    "vendor": "Fluro-gelenklager GmbH",
+    "source": "part"
+  },
+  {
+    "code": "0021",
+    "name": "Bellows for rod end, M10",
+    "ref": "KDN2RERS",
+    "vendor": "Fluro-gelenklager GmbH",
+    "source": "part"
+  },
+  {
+    "code": "0022",
+    "name": "Bellows for rod end, M8",
+    "ref": "KDN1RERS",
+    "vendor": "Fluro-gelenklager GmbH",
+    "source": "part"
+  },
+  {
+    "code": "0024",
+    "name": "DR 10 Distance bush",
+    "ref": "KDR010035",
+    "vendor": "Fluro-gelenklager GmbH",
+    "source": "part"
+  },
+  {
+    "code": "0025",
+    "name": "DR 8 Distance bush",
+    "ref": "KDR008035",
+    "vendor": "Fluro-gelenklager GmbH",
+    "source": "part"
+  },
+  {
+    "code": "0028",
+    "name": "Bearing for steering arm",
+    "ref": "",
+    "vendor": "Adoz",
+    "source": "part"
+  },
+  {
+    "code": "0029",
+    "name": "Bearing for Front Wheel Axle",
+    "ref": "ZEN 3303 B 2RS",
+    "vendor": "Adoz",
+    "source": "part"
+  },
+  {
+    "code": "0030",
+    "name": "Insert Ball Bearing for Pillow Block",
+    "ref": "UB 204",
+    "vendor": "Adoz",
+    "source": "part"
+  },
+  {
+    "code": "0031",
+    "name": "Pillow Block for Ball Bearing",
+    "ref": "NEU PP204",
+    "vendor": "Adoz",
+    "source": "part"
+  },
+  {
+    "code": "0032",
+    "name": "Seat Slide Bearing",
+    "ref": "WJ200UM-01-16",
+    "vendor": "Lin-Tech HENNLICH",
+    "source": "part"
+  },
+  {
+    "code": "0033",
+    "name": "Seat Slide Profile Left",
+    "ref": "",
+    "vendor": "Lin-Tech HENNLICH",
+    "source": "part"
+  },
+  {
+    "code": "0034",
+    "name": "Seat Slide Profile Right",
+    "ref": "",
+    "vendor": "Lin-Tech HENNLICH",
+    "source": "part"
+  },
+  {
+    "code": "0035",
+    "name": "Parking Brake Wire Sleeve 1.5m",
+    "ref": "",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0036",
+    "name": "Parking Brake Wire 1pc",
+    "ref": "",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0038",
+    "name": "Parking Brake Wire End Cap",
+    "ref": "",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0039",
+    "name": "Parking Brake Wire Sleeve Ferrule End Caps",
+    "ref": "",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0044",
+    "name": "Steering Head (1.25\")",
+    "ref": "K223-0",
+    "vendor": "B&K Precision Machining",
+    "source": "part"
+  },
+  {
+    "code": "0045",
+    "name": "Mudguard Holder",
+    "ref": "K183",
+    "vendor": "B&K Precision Machining",
+    "source": "part"
+  },
+  {
+    "code": "0047",
+    "name": "Battery mount alu",
+    "ref": "",
+    "vendor": "Rz Riboverken Ab",
+    "source": "part"
+  },
+  {
+    "code": "0048",
+    "name": "Rear Seat Support Bracket",
+    "ref": "",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0051",
+    "name": "Spindle (Kingpin) Rear Left/Right",
+    "ref": "K44-0",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0052",
+    "name": "Spindle (Kingpin) Front Left",
+    "ref": "K67-0",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0053",
+    "name": "Spindle (Kingpin) Front Right",
+    "ref": "K74-0",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0055",
+    "name": "Steering Rod (Ø13x3 190)",
+    "ref": "K206-0",
+    "vendor": "B&K Precision Machining",
+    "source": "part"
+  },
+  {
+    "code": "0056",
+    "name": "Bafang motor bracket",
+    "ref": "",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0058",
+    "name": "Bearing for Rear Wheel Axle",
+    "ref": "SKF 3303 A-2RS1TN9/MT33",
+    "vendor": "Adoz",
+    "source": "part"
+  },
+  {
+    "code": "0060",
+    "name": "Seat Adjust Handle Bar (aluminum)",
+    "ref": "",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0061",
+    "name": "Seat Adjust Handle Grip (black)",
+    "ref": "",
+    "vendor": "Lin-Tech HENNLICH",
+    "source": "part"
+  },
+  {
+    "code": "0062",
+    "name": "Chain ring spacer (42T motor shaft)",
+    "ref": "",
+    "vendor": "Rohloff AG",
+    "source": "part"
+  },
+  {
+    "code": "0064",
+    "name": "Steering Head Top Cap",
+    "ref": "K229-0",
+    "vendor": "B&K Precision Machining",
+    "source": "part"
+  },
+  {
+    "code": "0065",
+    "name": "Steering Arm",
+    "ref": "K81-0",
+    "vendor": "B&K Precision Machining",
+    "source": "part"
+  },
+  {
+    "code": "0066",
+    "name": "Steering Arm Connector Bar",
+    "ref": "K234-0",
+    "vendor": "B&K Precision Machining",
+    "source": "part"
+  },
+  {
+    "code": "0067",
+    "name": "Mirror",
+    "ref": "63501101",
+    "vendor": "Ergotec, Wilhelm Humpert",
+    "source": "part"
+  },
+  {
+    "code": "0068",
+    "name": "Front boom",
+    "ref": "K144",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0069",
+    "name": "Freewheel Axle",
+    "ref": "K255",
+    "vendor": "Zakovo",
+    "source": "part"
+  },
+  {
+    "code": "0070",
+    "name": "Lower Wishbone Front L",
+    "ref": "K123-0",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0074",
+    "name": "Main Frame",
+    "ref": "K82",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0075",
+    "name": "Connector Blocks for Seat Stops",
+    "ref": "",
+    "vendor": "B&K Precision Machining",
+    "source": "part"
+  },
+  {
+    "code": "0076",
+    "name": "Connector Block for Seat adjust handle bar",
+    "ref": "",
+    "vendor": "B&K Precision Machining",
+    "source": "part"
+  },
+  {
+    "code": "0077",
+    "name": "Samagaga Wheelhub",
+    "ref": "",
+    "vendor": "B&K Precision Machining",
+    "source": "part"
+  },
+  {
+    "code": "0078",
+    "name": "Rohloff mount",
+    "ref": "",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0080",
+    "name": "Frame Mount Lower",
+    "ref": "K344",
+    "vendor": "B&K Precision Machining",
+    "source": "part"
+  },
+  {
+    "code": "0081",
+    "name": "Rohloff Bottom Bracket",
+    "ref": "K345",
+    "vendor": "B&K Precision Machining",
+    "source": "part"
+  },
+  {
+    "code": "0082",
+    "name": "Chain Tensioner Mount",
+    "ref": "K720",
+    "vendor": "Aquadem",
+    "source": "part"
+  },
+  {
+    "code": "0083",
+    "name": "Rohloff bracket left",
+    "ref": "K346",
+    "vendor": "B&K Precision Machining",
+    "source": "part"
+  },
+  {
+    "code": "0084",
+    "name": "Gearbox Bracket Right",
+    "ref": "K347",
+    "vendor": "B&K Precision Machining",
+    "source": "part"
+  },
+  {
+    "code": "0086",
+    "name": "Seat Connector Block",
+    "ref": "ARM-00-641-086-A1",
+    "vendor": "B&K Precision Machining",
+    "source": "part"
+  },
+  {
+    "code": "0088",
+    "name": "House for Freewheel Bearings",
+    "ref": "K365-0",
+    "vendor": "B&K Precision Machining",
+    "source": "part"
+  },
+  {
+    "code": "0091",
+    "name": "Parallell Key - for axle locking",
+    "ref": "",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0093",
+    "name": "Retaining ring - Kingpins (Låsring)",
+    "ref": "",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0097",
+    "name": "Semi-Trailer Main Frame",
+    "ref": "K148",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0099",
+    "name": "Trailer Connector Fixed Block",
+    "ref": "K502",
+    "vendor": "Lin-Tech HENNLICH",
+    "source": "part"
+  },
+  {
+    "code": "0100",
+    "name": "Trailer Connector Bottom Wheel",
+    "ref": "K503",
+    "vendor": "Zakovo",
+    "source": "part"
+  },
+  {
+    "code": "0101",
+    "name": "Trailer Connector Top Wheel",
+    "ref": "K504",
+    "vendor": "Zakovo",
+    "source": "part"
+  },
+  {
+    "code": "0102",
+    "name": "Trailer Connector Bar",
+    "ref": "K505-0",
+    "vendor": "Zakovo",
+    "source": "part"
+  },
+  {
+    "code": "0104",
+    "name": "Gas spring lockring",
+    "ref": "",
+    "vendor": "Swebolt Järfälla",
+    "source": "part"
+  },
+  {
+    "code": "0118",
+    "name": "Indicator Button Extension Cable",
+    "ref": "",
+    "vendor": "Esika",
+    "source": "part"
+  },
+  {
+    "code": "0119",
+    "name": "Light Control Input Extension Cable",
+    "ref": "",
+    "vendor": "Suzhou Bafang Electric Motor Science-Technology",
+    "source": "part"
+  },
+  {
+    "code": "0120",
+    "name": "Bafang Display Extension Cable",
+    "ref": "",
+    "vendor": "Suzhou Bafang Electric Motor Science-Technology",
+    "source": "part"
+  },
+  {
+    "code": "0122",
+    "name": "Semi Trailer Extension Cable",
+    "ref": "",
+    "vendor": "Esika",
+    "source": "part"
+  },
+  {
+    "code": "0123",
+    "name": "Trailer Hitch Reinforcement Plate Lower",
+    "ref": "",
+    "vendor": "B&K Precision Machining",
+    "source": "part"
+  },
+  {
+    "code": "0124",
+    "name": "Trailer Hitch Reinforcement Plate Upper",
+    "ref": "",
+    "vendor": "B&K Precision Machining",
+    "source": "part"
+  },
+  {
+    "code": "0125",
+    "name": "Trailer Hitch Reinforcement Spacer Bar",
+    "ref": "",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0127",
+    "name": "Trailer Connector locking pin",
+    "ref": "",
+    "vendor": "B&K Precision Machining",
+    "source": "part"
+  },
+  {
+    "code": "0130",
+    "name": "Trailer Connector Hook v2",
+    "ref": "K507",
+    "vendor": "Lin-Tech HENNLICH",
+    "source": "part"
+  },
+  {
+    "code": "0133",
+    "name": "Shock Absorber 1000lbs",
+    "ref": "",
+    "vendor": "JP Trading & Engineering",
+    "source": "part"
+  },
+  {
+    "code": "0134",
+    "name": "Shock Absorber 1500lbs",
+    "ref": "",
+    "vendor": "JP Trading & Engineering",
+    "source": "part"
+  },
+  {
+    "code": "0139",
+    "name": "Left Handlebar Endcap",
+    "ref": "K965-0",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0140",
+    "name": "Retaining ring for Steering Bearing",
+    "ref": "",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0141",
+    "name": "Headset Bearing for Steering Head",
+    "ref": "",
+    "vendor": "Youxin Parts Co. Ltd",
+    "source": "part"
+  },
+  {
+    "code": "0142",
+    "name": "Shock absorber 750lbs",
+    "ref": "DNM DV22 165 mm 750 lbs",
+    "vendor": "JP Trading & Engineering",
+    "source": "part"
+  },
+  {
+    "code": "0143",
+    "name": "Parking Brake Lever",
+    "ref": "LK1823",
+    "vendor": "Saccon",
+    "source": "part"
+  },
+  {
+    "code": "0144",
+    "name": "Pedals (Left & Right)",
+    "ref": "",
+    "vendor": "Youxin Parts Co. Ltd",
+    "source": "part"
+  },
+  {
+    "code": "0145",
+    "name": "Display & Parking Brake Holder",
+    "ref": "",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0146",
+    "name": "Upper Wishbone",
+    "ref": "K147-0",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0147",
+    "name": "Lower Wishbone Rear R",
+    "ref": "K124-0",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0148",
+    "name": "Semi Trailer Platform Weld Assembly",
+    "ref": "K16",
+    "vendor": "Ab Aluminium",
+    "source": "part"
+  },
+  {
+    "code": "0150",
+    "name": "Rocker Arm Slider",
+    "ref": "K1",
+    "vendor": "Rz Riboverken Ab",
+    "source": "part"
+  },
+  {
+    "code": "0169",
+    "name": "Rohloff Gearhub",
+    "ref": "68067T",
+    "vendor": "Rohloff AG",
+    "source": "part"
+  },
+  {
+    "code": "0170",
+    "name": "Rohloff Splined Sprocket 15t",
+    "ref": "",
+    "vendor": "Rohloff AG",
+    "source": "part"
+  },
+  {
+    "code": "0171",
+    "name": "Rohloff Snap-ring for Splined Sprocket",
+    "ref": "",
+    "vendor": "Rohloff AG",
+    "source": "part"
+  },
+  {
+    "code": "0178",
+    "name": "Bottom Bracket BB-UN26 68mm / 110mm",
+    "ref": "",
+    "vendor": "Sturmey-Archer Europa",
+    "source": "part"
+  },
+  {
+    "code": "0179",
+    "name": "Slide Bearings 6x8x10 black PA",
+    "ref": "GFM-0608-10",
+    "vendor": "Lin-Tech HENNLICH",
+    "source": "part"
+  },
+  {
+    "code": "0180",
+    "name": "Chain Tensioner",
+    "ref": "CTS80",
+    "vendor": "Sturmey-Archer Europa",
+    "source": "part"
+  },
+  {
+    "code": "0181",
+    "name": "Steering Head Bottom Cap",
+    "ref": "K227-0",
+    "vendor": "B&K Precision Machining",
+    "source": "part"
+  },
+  {
+    "code": "0183",
+    "name": "PA tube for chain, short",
+    "ref": "",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0184",
+    "name": "PA tube for chain, long",
+    "ref": "",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0185",
+    "name": "Mudguard",
+    "ref": "90.0002.18",
+    "vendor": "Your Plastic Solutions",
+    "source": "part"
+  },
+  {
+    "code": "01851",
+    "name": "Mudguard rear Left",
+    "ref": "",
+    "vendor": "Your Plastic Solutions",
+    "source": "part"
+  },
+  {
+    "code": "01852",
+    "name": "Mudguard rear right",
+    "ref": "",
+    "vendor": "Your Plastic Solutions",
+    "source": "part"
+  },
+  {
+    "code": "0186",
+    "name": "Mudguard (Semi Version)",
+    "ref": "",
+    "vendor": "",
+    "source": "part"
+  },
+  {
+    "code": "0187",
+    "name": "Brake Disc Bolts (M5x10 Torx black)",
+    "ref": "",
+    "vendor": "",
+    "source": "part"
+  },
+  {
+    "code": "0188",
+    "name": "Brake Bolt (M6*1.0*18.5) Black",
+    "ref": "",
+    "vendor": "",
+    "source": "part"
+  },
+  {
+    "code": "0191",
+    "name": "M8 with black plastic ring (crank + motor) 2/pack",
+    "ref": "BAS15 BOLTS",
+    "vendor": "Sturmey-Archer Europa",
+    "source": "part"
+  },
+  {
+    "code": "0192",
+    "name": "Cross Cardan Shaft (with Bellows)",
+    "ref": "1310-0595",
+    "vendor": "EIE",
+    "source": "part"
+  },
+  {
+    "code": "0195",
+    "name": "Tyres",
+    "ref": "",
+    "vendor": "Schwalbe Pick-up 55-406",
+    "source": "part"
+  },
+  {
+    "code": "0197",
+    "name": "Crank Arm with Sprocket (left thread)",
+    "ref": "",
+    "vendor": "JP Trading & Engineering",
+    "source": "part"
+  },
+  {
+    "code": "0198",
+    "name": "Crank Arm (right thread, included in 0197)",
+    "ref": "",
+    "vendor": "JP Trading & Engineering",
+    "source": "part"
+  },
+  {
+    "code": "0199",
+    "name": "Spider Joint Lower Front Wishbone",
+    "ref": "",
+    "vendor": "Youxin Parts Co. Ltd",
+    "source": "part"
+  },
+  {
+    "code": "0200",
+    "name": "Silent Block Bushing",
+    "ref": "",
+    "vendor": "Youxin Parts Co. Ltd",
+    "source": "part"
+  },
+  {
+    "code": "0212",
+    "name": "Spacer for Pillow Block (NEU204/SB204)",
+    "ref": "",
+    "vendor": "B&K Precision Machining",
+    "source": "part"
+  },
+  {
+    "code": "0214",
+    "name": "Slide bearing for seatstopper",
+    "ref": "GFM-1214-15",
+    "vendor": "Lin-Tech HENNLICH",
+    "source": "part"
+  },
+  {
+    "code": "0308",
+    "name": "Bafang Speed Sensor",
+    "ref": "",
+    "vendor": "",
+    "source": "part"
+  },
+  {
+    "code": "0316",
+    "name": "Wheel Axle, Driven",
+    "ref": "K235-0",
+    "vendor": "Zakovo",
+    "source": "part"
+  },
+  {
+    "code": "0317",
+    "name": "Wheel Axle, Non-Driven",
+    "ref": "R20021",
+    "vendor": "Zakovo",
+    "source": "part"
+  },
+  {
+    "code": "0320",
+    "name": "Bafang Motor bracket nut",
+    "ref": "",
+    "vendor": "Suzhou Bafang Electric Motor Science-Technology",
+    "source": "part"
+  },
+  {
+    "code": "0321",
+    "name": "Bafang motor bracket bolt",
+    "ref": "",
+    "vendor": "Suzhou Bafang Electric Motor Science-Technology",
+    "source": "part"
+  },
+  {
+    "code": "0355",
+    "name": "Bumper V3",
+    "ref": "K700",
+    "vendor": "Ab Aluminium",
+    "source": "part"
+  },
+  {
+    "code": "0360",
+    "name": "Tail light",
+    "ref": "",
+    "vendor": "Youxin Parts Co. Ltd",
+    "source": "part"
+  },
+  {
+    "code": "0361",
+    "name": "Indicator light",
+    "ref": "",
+    "vendor": "Paaschburg & Wunderlich",
+    "source": "part"
+  },
+  {
+    "code": "0364",
+    "name": "Headlight V2",
+    "ref": "4060-0001",
+    "vendor": "Herrmans Oy Ab",
+    "source": "part"
+  },
+  {
+    "code": "0365",
+    "name": "Front reflector FR-8",
+    "ref": "3103-0005",
+    "vendor": "Herrmans Oy Ab",
+    "source": "part"
+  },
+  {
+    "code": "0366",
+    "name": "Rear reflector BR-8",
+    "ref": "3005-0001",
+    "vendor": "Herrmans Oy Ab",
+    "source": "part"
+  },
+  {
+    "code": "0368",
+    "name": "Double sprocket 29T, Rohloff",
+    "ref": "",
+    "vendor": "Zakovo",
+    "source": "part"
+  },
+  {
+    "code": "0369",
+    "name": "Holder for Bafang Speed Sensor",
+    "ref": "",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0370",
+    "name": "Magnet for Bafang Speed Sensor",
+    "ref": "",
+    "vendor": "Suzhou Bafang Electric Motor Science-Technology",
+    "source": "part"
+  },
+  {
+    "code": "0371",
+    "name": "Double sprocket 31T, freewheel",
+    "ref": "K348",
+    "vendor": "Zakovo",
+    "source": "part"
+  },
+  {
+    "code": "0372-1",
+    "name": "Electric box for bike PC",
+    "ref": "",
+    "vendor": "Esika",
+    "source": "part"
+  },
+  {
+    "code": "0374",
+    "name": "Cable 4p Armadillo",
+    "ref": "",
+    "vendor": "",
+    "source": "part"
+  },
+  {
+    "code": "0375",
+    "name": "Cable 8p Armadillo",
+    "ref": "",
+    "vendor": "",
+    "source": "part"
+  },
+  {
+    "code": "0376",
+    "name": "Rear brake system",
+    "ref": "",
+    "vendor": "JP Trading & Engineering",
+    "source": "part"
+  },
+  {
+    "code": "0396",
+    "name": "Convex Washer for Parking Brake 4pc (inclued in caliper)",
+    "ref": "",
+    "vendor": "Youxin Parts Co. Ltd",
+    "source": "part"
+  },
+  {
+    "code": "0397",
+    "name": "Wheel - Alligt v3 Black incl Center",
+    "ref": "",
+    "vendor": "Alligt",
+    "source": "part"
+  },
+  {
+    "code": "0401",
+    "name": "1-Container Platform Weld Assembly",
+    "ref": "K39",
+    "vendor": "Ab Aluminium",
+    "source": "part"
+  },
+  {
+    "code": "0402",
+    "name": "Container Platform Support Strut Short",
+    "ref": "K28",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0403",
+    "name": "Container Platform Support Strut Long",
+    "ref": "",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0404",
+    "name": "Front brake system",
+    "ref": "",
+    "vendor": "JP Trading & Engineering",
+    "source": "part"
+  },
+  {
+    "code": "0405",
+    "name": "Quick release for seat",
+    "ref": "60180A",
+    "vendor": "Powerfactory Nordic Oy Ab",
+    "source": "part"
+  },
+  {
+    "code": "0407",
+    "name": "Seat Connection Aluminum L-profile",
+    "ref": "",
+    "vendor": "B&K Precision Machining",
+    "source": "part"
+  },
+  {
+    "code": "0408",
+    "name": "Concave Washer for Parking Brake 4pc (inclued in caliper)",
+    "ref": "",
+    "vendor": "Youxin Parts Co. Ltd",
+    "source": "part"
+  },
+  {
+    "code": "0415",
+    "name": "Slide stopper left",
+    "ref": "",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0416",
+    "name": "Slide stopper right",
+    "ref": "",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0417",
+    "name": "Stop Ring for Extension Spring (0010)",
+    "ref": "",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0437",
+    "name": "Cable gland, black",
+    "ref": "",
+    "vendor": "Esika",
+    "source": "part"
+  },
+  {
+    "code": "0438",
+    "name": "O-ring for cable gland",
+    "ref": "",
+    "vendor": "Esika",
+    "source": "part"
+  },
+  {
+    "code": "0449",
+    "name": "Indicator lights control buttons",
+    "ref": "MME001",
+    "vendor": "Motone Customs",
+    "source": "part"
+  },
+  {
+    "code": "0454",
+    "name": "Lower Wishbone Front R",
+    "ref": "K117-0",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0455",
+    "name": "Rohloff Tension Screw",
+    "ref": "",
+    "vendor": "B&K Precision Machining",
+    "source": "part"
+  },
+  {
+    "code": "0456",
+    "name": "Lower wishbone Rear L",
+    "ref": "",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0460",
+    "name": "Quick Link Chain Connector",
+    "ref": "CL573NPB",
+    "vendor": "K.M.C. Chain Europe",
+    "source": "part"
+  },
+  {
+    "code": "0461",
+    "name": "IS Brake Adapter",
+    "ref": "",
+    "vendor": "",
+    "source": "part"
+  },
+  {
+    "code": "0462",
+    "name": "Steering Handle Bars",
+    "ref": "",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0463",
+    "name": "Rohloff TS Axle Bolt* (Achsmuttern)",
+    "ref": "",
+    "vendor": "Rohloff AG",
+    "source": "part"
+  },
+  {
+    "code": "0464",
+    "name": "Rohloff Washer for TS",
+    "ref": "",
+    "vendor": "Rohloff AG",
+    "source": "part"
+  },
+  {
+    "code": "0465",
+    "name": "Rohloff Tandem Cable 2.5m - EJ AKTUELL",
+    "ref": "",
+    "vendor": "Rohloff AG",
+    "source": "part"
+  },
+  {
+    "code": "0466",
+    "name": "Rohloff Twist Shifter (Modified)",
+    "ref": "",
+    "vendor": "Rohloff AG",
+    "source": "part"
+  },
+  {
+    "code": "0467",
+    "name": "Rohloff Cable Box incl. Cable Tensioner",
+    "ref": "",
+    "vendor": "Rohloff AG",
+    "source": "part"
+  },
+  {
+    "code": "0468",
+    "name": "Rohloff Cable Housing Caps",
+    "ref": "",
+    "vendor": "Rohloff AG",
+    "source": "part"
+  },
+  {
+    "code": "0469",
+    "name": "Rohloff Double Sprocket Bolt",
+    "ref": "",
+    "vendor": "Rohloff AG",
+    "source": "part"
+  },
+  {
+    "code": "0470",
+    "name": "Brake rotor, Tektro 160-1",
+    "ref": "",
+    "vendor": "JP Trading & Engineering",
+    "source": "part"
+  },
+  {
+    "code": "0471",
+    "name": "Sram chainring Bolt 5-arm",
+    "ref": "116915012000",
+    "vendor": "Cycle Service Nordic",
+    "source": "part"
+  },
+  {
+    "code": "0472",
+    "name": "Chainring Nut (Allen key type)",
+    "ref": "",
+    "vendor": "Cycle Service Nordic",
+    "source": "part"
+  },
+  {
+    "code": "0473",
+    "name": "Bafang Motor to Chain Ring Adapter",
+    "ref": "",
+    "vendor": "B&K Precision Machining",
+    "source": "part"
+  },
+  {
+    "code": "0474",
+    "name": "Bafang Display incl. Button panel",
+    "ref": "",
+    "vendor": "Suzhou Bafang Electric Motor Science-Technology",
+    "source": "part"
+  },
+  {
+    "code": "0475",
+    "name": "Rubber Spacers for Bafang Display",
+    "ref": "",
+    "vendor": "Youxin Parts Co. Ltd",
+    "source": "part"
+  },
+  {
+    "code": "0476",
+    "name": "Rubber Handles (pair)",
+    "ref": "97.2161.04",
+    "vendor": "Domino Group",
+    "source": "part"
+  },
+  {
+    "code": "0481",
+    "name": "Cylindrical Slide Block for Seat (Black POM)",
+    "ref": "K339",
+    "vendor": "Lin-Tech HENNLICH",
+    "source": "part"
+  },
+  {
+    "code": "0482",
+    "name": "Seat Connector Bracket (alu bridge shape)",
+    "ref": "K323 (2016_koppelklemblokje)",
+    "vendor": "B&K Precision Machining",
+    "source": "part"
+  },
+  {
+    "code": "0483",
+    "name": "Speed sensor, 590 mm",
+    "ref": "",
+    "vendor": "Suzhou Bafang Electric Motor Science-Technology",
+    "source": "part"
+  },
+  {
+    "code": "0484",
+    "name": "Striker Bolt",
+    "ref": "R4-90-441-10",
+    "vendor": "Onkenhout & Onkenhout B.V",
+    "source": "part"
+  },
+  {
+    "code": "0485-01",
+    "name": "Parking Brake (Caliper)",
+    "ref": "",
+    "vendor": "JP Trading & Engineering",
+    "source": "part"
+  },
+  {
+    "code": "0486",
+    "name": "Light Bracket for Platform",
+    "ref": "K500",
+    "vendor": "Katanga",
+    "source": "part"
+  },
+  {
+    "code": "0488",
+    "name": "Rohloff Adapter Tube",
+    "ref": "",
+    "vendor": "Materialise",
+    "source": "part"
+  },
+  {
+    "code": "0489",
+    "name": "Kingpin Inner Cap",
+    "ref": "",
+    "vendor": "Essentra Components",
+    "source": "part"
+  },
+  {
+    "code": "0491",
+    "name": "Chain on Roll",
+    "ref": "",
+    "vendor": "K.M.C. Chain Europe",
+    "source": "part"
+  },
+  {
+    "code": "0495",
+    "name": "Bafang Locking Ring",
+    "ref": "",
+    "vendor": "Suzhou Bafang Electric Motor Science-Technology",
+    "source": "part"
+  },
+  {
+    "code": "0505",
+    "name": "Rocker Arm Lock_Steel",
+    "ref": "",
+    "vendor": "",
+    "source": "part"
+  },
+  {
+    "code": "0540",
+    "name": "Light Control Board v2.0",
+    "ref": "",
+    "vendor": "Esika",
+    "source": "part"
+  },
+  {
+    "code": "0542",
+    "name": "Electronics Box Backplate, with Rivet",
+    "ref": "K1006",
+    "vendor": "",
+    "source": "part"
+  },
+  {
+    "code": "0543",
+    "name": "XLC Pedal PD-M16 Black",
+    "ref": "2501813600",
+    "vendor": "Cycle Service Nordic",
+    "source": "part"
+  },
+  {
+    "code": "0551",
+    "name": "Chain complete",
+    "ref": "RE1NP0000",
+    "vendor": "K.M.C. Chain Europe",
+    "source": "part"
+  },
+  {
+    "code": "0553",
+    "name": "Bolt set for chain cover disc",
+    "ref": "",
+    "vendor": "JP Trading & Engineering",
+    "source": "part"
+  },
+  {
+    "code": "0554",
+    "name": "Tail light LED strip",
+    "ref": "4220322",
+    "vendor": "Diodhuset Sverige AB",
+    "source": "part"
+  },
+  {
+    "code": "0561",
+    "name": "Box v2 Rear Light Stem Cable",
+    "ref": "",
+    "vendor": "Esika",
+    "source": "part"
+  },
+  {
+    "code": "0562",
+    "name": "Box v2 Rear Light Pigtail Cable",
+    "ref": "",
+    "vendor": "Esika",
+    "source": "part"
+  },
+  {
+    "code": "0563",
+    "name": "Box v2 Front Light Stem Cable",
+    "ref": "",
+    "vendor": "Esika",
+    "source": "part"
+  },
+  {
+    "code": "0564",
+    "name": "Box v2 Front Light Pigtail Cable",
+    "ref": "",
+    "vendor": "Esika",
+    "source": "part"
+  },
+  {
+    "code": "0565",
+    "name": "Box v2 Battery Pigtail Cable",
+    "ref": "",
+    "vendor": "Esika",
+    "source": "part"
+  },
+  {
+    "code": "0566",
+    "name": "Box v2 Controls Pigtail Cable",
+    "ref": "",
+    "vendor": "Esika",
+    "source": "part"
+  },
+  {
+    "code": "0567",
+    "name": "Box v2 Extension Cable Front",
+    "ref": "",
+    "vendor": "Esika",
+    "source": "part"
+  },
+  {
+    "code": "0573",
+    "name": "Wheel Cap v2 (Steel, Taller)",
+    "ref": "K176-1",
+    "vendor": "B&K Precision Machining",
+    "source": "part"
+  },
+  {
+    "code": "0574",
+    "name": "Bumper main part",
+    "ref": "K755-0",
+    "vendor": "Ab Aluminium",
+    "source": "part"
+  },
+  {
+    "code": "0575",
+    "name": "Bumper upper mount",
+    "ref": "K706-0",
+    "vendor": "Ab Aluminium",
+    "source": "part"
+  },
+  {
+    "code": "0602",
+    "name": "Battery Mount Backplate (Dual Version)",
+    "ref": "K991-2",
+    "vendor": "Aquadem",
+    "source": "part"
+  },
+  {
+    "code": "0490",
+    "name": "wheel cap",
+    "ref": "check with Velove",
+    "vendor": "",
+    "source": "part"
+  },
+  {
+    "code": "0189",
+    "name": "tube AV for 55-406",
+    "ref": "stock katanga",
+    "vendor": "",
+    "source": "part"
+  },
+  {
+    "code": "",
+    "name": "SEAT FLEVO",
+    "ref": "",
+    "vendor": "",
+    "source": "part"
+  },
+  {
+    "code": "05500",
+    "name": "Freewheel Set",
+    "ref": "K790",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0069",
+    "name": "Freewheel Axle",
+    "ref": "K255",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0008",
+    "name": "Bearing Freewheel",
+    "ref": "UKS 30 2RS Freewheel",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0088",
+    "name": "House for Freewheel Bearings",
+    "ref": "K365-0",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "",
+    "name": "hours",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "05503",
+    "name": "Spindle (Kingpin) Front Left Set",
+    "ref": "K519",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0052",
+    "name": "Spindle (Kingpin) Front Left",
+    "ref": "K67-0",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0029",
+    "name": "Bearing for Front Wheel Axle",
+    "ref": "ZEN 3303 B 2RS",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0093",
+    "name": "Retaining ring - Kingpins (Låsring)",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0317",
+    "name": "Wheel Axle, Non-Driven",
+    "ref": "R20021",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "05516",
+    "name": "Rod End Right M8 Set",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "05504",
+    "name": "Spindle (Kingpin) Front Right Set",
+    "ref": "K520",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0053",
+    "name": "Spindle (Kingpin) Front Right",
+    "ref": "K74-0",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "05505",
+    "name": "Front Light Set",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0364",
+    "name": "Headlight V2",
+    "ref": "4060-0001",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "",
+    "name": "JWPF",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "05506",
+    "name": "Rear Light Set",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0554",
+    "name": "Tail light LED strip",
+    "ref": "4220322",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "05507",
+    "name": "Indicator Light Set",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0361",
+    "name": "Indicator light",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "05508",
+    "name": "Front Bumper Set",
+    "ref": "K999",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0574",
+    "name": "Bumper main part",
+    "ref": "K755-0",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0575",
+    "name": "Bumper upper mount",
+    "ref": "K706-0",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "05511",
+    "name": "Rod End M10 Set",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0017",
+    "name": "Rod end, M10",
+    "ref": "HCGKAW10",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0021",
+    "name": "Bellows for rod end, M10",
+    "ref": "KDN2RERS",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0024",
+    "name": "DR 10 Distance bush",
+    "ref": "KDR010035",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "05512",
+    "name": "Chain Front",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0491",
+    "name": "Chain on Roll (€/m)",
+    "ref": "RE1NP0000",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0460",
+    "name": "Quick Link Chain Connector",
+    "ref": "CL573NPB",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "05513",
+    "name": "Chain Mid",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "05514",
+    "name": "Chain Rear",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0019",
+    "name": "Rod end, M8 right thread",
+    "ref": "HCGKAW08",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0022",
+    "name": "Bellows for rod end, M8",
+    "ref": "KDN1RERS",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0025",
+    "name": "DR 8 Distance bush",
+    "ref": "KDR008035",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "05517",
+    "name": "Rod End Left M8 Set",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0018",
+    "name": "Rod end, M8 left thread",
+    "ref": "HCGKLAW08",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "05522G",
+    "name": "Front boom set, Grey",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0178",
+    "name": "Bottom Bracket BB-UN26 68mm / 110mm",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0068",
+    "name": "Front boom",
+    "ref": "K144",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "",
+    "name": "rivet nuts M5",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "05526G",
+    "name": "Lower wishbone front L set, Grey",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0200",
+    "name": "Silent Block Bushing",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0070",
+    "name": "Lower Wishbone Front L",
+    "ref": "K123-0",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0199",
+    "name": "Spider Joint Lower Front Wishbone",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "05527G",
+    "name": "Lower wishbone front R set, Grey",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0454",
+    "name": "Lower Wishbone Front R",
+    "ref": "K117-0",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "05528G",
+    "name": "Lower wishbone rear R set, Grey",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0147",
+    "name": "Lower Wishbone Rear R",
+    "ref": "K124-0",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "05529G",
+    "name": "Lower wishbone rear L set, Grey",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0456",
+    "name": "Lower wishbone Rear L",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "05530",
+    "name": "Indicator button set",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0449",
+    "name": "Indicator lights control buttons",
+    "ref": "MME001",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "05535",
+    "name": "Spindle (Kingpin) Rear Driven Set",
+    "ref": "K521",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0051",
+    "name": "Spindle (Kingpin) Rear Left/Right",
+    "ref": "K44-0",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0058",
+    "name": "Bearing for Rear Wheel Axle",
+    "ref": "SKF 3303 A-2RS1TN9/MT33",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0316",
+    "name": "Wheel Axle, Driven",
+    "ref": "K235-0",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0091",
+    "name": "Parallell Key - for axle locking",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "05536",
+    "name": "Spindle Assembly Rear Non-Driven",
+    "ref": "K528",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "05542",
+    "name": "Seat slider Set",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0010",
+    "name": "Extension Spring for Handle",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0032",
+    "name": "Seat Slide Bearing",
+    "ref": "WJ200UM-01-16",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0033",
+    "name": "Seat Slide Profile Left",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0034",
+    "name": "Seat Slide Profile Right",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0048",
+    "name": "Rear Seat Support Bracket",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0060",
+    "name": "Seat Adjust Handle Bar (aluminum)",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0061",
+    "name": "Seat Adjust Handle Grip (black)",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0075",
+    "name": "Connector Blocks for Seat Stops",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0076",
+    "name": "Connector Block for Seat adjust handle bar",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0086",
+    "name": "Seat Connector Block",
+    "ref": "ARM-00-641-086-A1",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0214",
+    "name": "Slide bearing for seatstopper",
+    "ref": "GFM-1214-15",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0407",
+    "name": "Seat Connection Aluminum L-profile",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0415",
+    "name": "Slide stopper left",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0416",
+    "name": "Slide stopper right",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0417",
+    "name": "Stop Ring for Extension Spring (0010)",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "05544",
+    "name": "Main Frame, with rivets",
+    "ref": "K543",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0074",
+    "name": "Main Frame",
+    "ref": "K82",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "",
+    "name": "rivet nuts M4/M5/M4/M8",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "05554",
+    "name": "Electronic light box set V2",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0540",
+    "name": "Light Control Board v2.0",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0542",
+    "name": "Electronics Box Backplate, with Rivet",
+    "ref": "K1006",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0372-1",
+    "name": "Electric box for bike PC",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0437",
+    "name": "Cable gland, black",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0438",
+    "name": "O-ring for cable gland",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "10001",
+    "name": "Armadillo with platform",
+    "ref": "K484",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "10060",
+    "name": "Armadillo Chassis",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "10057",
+    "name": "Semi Trailer Platform",
+    "ref": "K15",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "10055",
+    "name": "Rear Light Assembly",
+    "ref": "K501",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "10002",
+    "name": "Armadillo with Trailer connections",
+    "ref": "K485",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "10056",
+    "name": "Semi Trailer Hitch",
+    "ref": "K506-0",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "10003",
+    "name": "Semi Trailer With platform",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "10042",
+    "name": "Semi Trailer Chassis without Quick Release",
+    "ref": "K513",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0097",
+    "name": "Semi-Trailer Main Frame",
+    "ref": "K148",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0077",
+    "name": "Samagaga Wheelhub",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0397",
+    "name": "Wheel - Alligt v3 Black incl Center",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0146",
+    "name": "Upper Wishbone",
+    "ref": "K147-0",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0195",
+    "name": "Tyres",
+    "ref": "Apollo cargo 20601L",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "10054",
+    "name": "1-Container platform",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0401",
+    "name": "1-Container Platform Weld Assembly",
+    "ref": "K39",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0402",
+    "name": "Container Platform Support Strut Short",
+    "ref": "K28",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0403",
+    "name": "Container Platform Support Strut Long",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0484",
+    "name": "Striker Bolt",
+    "ref": "R4-90-441-10",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0486",
+    "name": "Light Bracket for Platform",
+    "ref": "K500",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0099",
+    "name": "Trailer Connector Fixed Block",
+    "ref": "K502",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0100",
+    "name": "Trailer Connector Bottom Wheel",
+    "ref": "K503",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0101",
+    "name": "Trailer Connector Top Wheel",
+    "ref": "K504",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0102",
+    "name": "Trailer Connector Bar",
+    "ref": "K505-0",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0122",
+    "name": "Semi Trailer Extension Cable",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0123",
+    "name": "Trailer Hitch Reinforcement Plate Lower",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0124",
+    "name": "Trailer Hitch Reinforcement Plate Upper",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0125",
+    "name": "Trailer Hitch Reinforcement Spacer Bar",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0127",
+    "name": "Trailer Connector locking pin",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0130",
+    "name": "Trailer Connector Hook v2",
+    "ref": "K507",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0148",
+    "name": "Semi Trailer Platform Weld Assembly",
+    "ref": "K16",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0150",
+    "name": "Rocker Arm Slider",
+    "ref": "K1",
+    "vendor": "",
+    "source": "assembly/component"
+  },
+  {
+    "code": "0505",
+    "name": "Rocker Arm Lock_Steel",
+    "ref": "",
+    "vendor": "",
+    "source": "assembly/component"
+  }
+];
+    const STORAGE_KEY = "armadillo-supercycle-table-v1";
+
+    const ui = {
+      en: {
+        appTitle: "Armadillo Supercycle Build Table",
+        appSubtitle: "PDF instructions converted into editable steps, enriched with BOM references from BOM.xlsx.",
+        search: "Search steps, parts, screws...",
+        catalogSearch: "Search BOM code or name...",
+        langToggle: "FR",
+        addStep: "Add step",
+        openDiagrams: "Diagrams",
+        showDeleted: "Show deleted",
+        hideDeleted: "Hide deleted",
+        exportJson: "Export JSON",
+        exportPortable: "Portable save",
+        resetData: "Reset",
+        phase: "Phase",
+        step: "Step",
+        components: "Components",
+        hardware: "Screws / fasteners",
+        consumables: "Tools / consumables",
+        instructions: "Instructions",
+        actions: "Actions",
+        edit: "Edit",
+        remove: "Remove",
+        restore: "Restore",
+        activeSummary: "Active build summary",
+        catalogTitle: "BOM catalog",
+        activeSteps: "Active steps",
+        deletedSteps: "Deleted",
+        componentsCount: "Component lines",
+        hardwareCount: "Fastener lines",
+        noItems: "No items listed",
+        modalEdit: "Edit step",
+        modalAdd: "Add step",
+        cancel: "Cancel",
+        save: "Save",
+        copied: "JSON copied to clipboard",
+        portableSaved: "Portable save downloaded. Replace armadillo_portable_state.js in this folder with the downloaded file before sending the folder.",
+        source: "Source",
+        noResults: "No matching steps.",
+        bomNone: "No BOM match",
+        resetConfirm: "Reset all local edits and reload the original extracted data?",
+      },
+      fr: {
+        appTitle: "Table de fabrication Armadillo Supercycle",
+        appSubtitle: "Instructions PDF converties en étapes modifiables, enrichies avec les références BOM de BOM.xlsx.",
+        search: "Rechercher étapes, pièces, vis...",
+        catalogSearch: "Rechercher code ou nom BOM...",
+        langToggle: "EN",
+        addStep: "Ajouter une étape",
+        openDiagrams: "Schémas",
+        showDeleted: "Voir supprimées",
+        hideDeleted: "Masquer supprimées",
+        exportJson: "Exporter JSON",
+        exportPortable: "Sauvegarde portable",
+        resetData: "Réinitialiser",
+        phase: "Phase",
+        step: "Étape",
+        components: "Composants",
+        hardware: "Vis / fixation",
+        consumables: "Outils / consommables",
+        instructions: "Instructions",
+        actions: "Actions",
+        edit: "Modifier",
+        remove: "Supprimer",
+        restore: "Restaurer",
+        activeSummary: "Résumé actif",
+        catalogTitle: "Catalogue BOM",
+        activeSteps: "Étapes actives",
+        deletedSteps: "Supprimées",
+        componentsCount: "Lignes composants",
+        hardwareCount: "Lignes visserie",
+        noItems: "Aucun élément listé",
+        modalEdit: "Modifier l’étape",
+        modalAdd: "Ajouter une étape",
+        cancel: "Annuler",
+        save: "Enregistrer",
+        copied: "JSON copié dans le presse-papiers",
+        portableSaved: "Sauvegarde portable téléchargée. Remplace armadillo_portable_state.js dans ce dossier par le fichier téléchargé avant d'envoyer le dossier.",
+        source: "Source",
+        noResults: "Aucune étape correspondante.",
+        bomNone: "Aucune correspondance BOM",
+        resetConfirm: "Réinitialiser les modifications locales et recharger les données extraites ?",
+      }
+    };
+
+    const frTerms = [
+      ["socket head cap bolt", "vis CHC"],
+      ["countersunk torque screws", "vis fraisées Torx"],
+      ["countersunk screw", "vis fraisée"],
+      ["countersunk", "fraisé"],
+      ["nylon stop nuts", "écrous frein nylon"],
+      ["nylon stop nut", "écrou frein nylon"],
+      ["regular nuts", "écrous standards"],
+      ["regular nut", "écrou standard"],
+      ["washers", "rondelles"],
+      ["washer", "rondelle"],
+      ["thick washer", "rondelle épaisse"],
+      ["wedge lock washers", "rondelles autobloquantes"],
+      ["distance bushes", "entretoises"],
+      ["distance bush", "entretoise"],
+      ["bolt", "boulon"],
+      ["bolts", "boulons"],
+      ["screw", "vis"],
+      ["screws", "vis"],
+      ["rod end", "rotule"],
+      ["left thread", "filetage gauche"],
+      ["right thread", "filetage droit"],
+      ["bellows", "soufflets"],
+      ["bellow", "soufflet"],
+      ["main frame", "cadre principal"],
+      ["lower wishbone", "triangle inférieur"],
+      ["upper wishbone", "triangle supérieur"],
+      ["front", "avant"],
+      ["rear", "arrière"],
+      ["kingpin", "porte-fusée"],
+      ["steering", "direction"],
+      ["brake adapter", "adaptateur de frein"],
+      ["brake adapters", "adaptateurs de frein"],
+      ["brake disc", "disque de frein"],
+      ["front brakes", "freins avant"],
+      ["back brakes", "freins arrière"],
+      ["shock absorbers", "amortisseurs"],
+      ["shock absorber", "amortisseur"],
+      ["seat slide", "coulisseau de siège"],
+      ["seat", "siège"],
+      ["handle", "poignée"],
+      ["handle bars", "guidons"],
+      ["mudguard", "garde-boue"],
+      ["mudguards", "garde-boue"],
+      ["holder", "support"],
+      ["holders", "supports"],
+      ["retaining rings", "circlips"],
+      ["retaining ring", "circlip"],
+      ["bearing", "roulement"],
+      ["bearings", "roulements"],
+      ["grease", "graisse"],
+      ["weak Loctite", "Loctite faible"],
+      ["strong Loctite", "Loctite fort"],
+      ["file", "lime"],
+      ["rubber mallet", "maillet en caoutchouc"],
+      ["vise", "étau"],
+      ["tie-wraps", "colliers nylon"],
+      ["mirrors", "rétroviseurs"],
+      ["rubber handles", "poignées caoutchouc"],
+      ["wheel", "roue"],
+      ["wheels", "roues"],
+      ["tire", "pneu"],
+      ["tires", "pneus"],
+      ["inner tubes", "chambres à air"],
+      ["parallel keys", "clavettes parallèles"],
+      ["parallel key", "clavette parallèle"],
+    ];
+
+    const catalogByCode = new Map();
+    BOM_CATALOG.forEach(item => {
+      if (item.code && !catalogByCode.has(item.code.toUpperCase())) catalogByCode.set(item.code.toUpperCase(), item);
+    });
+
+    let state = loadState();
+    let showDeleted = false;
+    let editingId = null;
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (error) {}
+      if (window.ARMADILLO_PORTABLE_STATE?.tableSteps) {
+        return { lang: "en", steps: structuredClone(window.ARMADILLO_PORTABLE_STATE.tableSteps) };
+      }
+      return { lang: "en", steps: structuredClone(INITIAL_STEPS) };
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function txt(key) {
+      return ui[state.lang][key] || ui.en[key] || key;
+    }
+
+    function escapeHtml(value) {
+      return String(value || "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[ch]));
+    }
+
+    function translateLine(text) {
+      if (state.lang !== "fr") return text;
+      let out = text;
+      for (const [en, fr] of frTerms) {
+        out = out.replace(new RegExp(`\\b${escapeRegex(en)}\\b`, "gi"), fr);
+      }
+      return out;
+    }
+
+    function escapeRegex(value) {
+      return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    }
+
+    function localStep(step) {
+      return {
+        phase: state.lang === "fr" ? (step.phaseFr || translateLine(step.phaseEn)) : step.phaseEn,
+        title: state.lang === "fr" ? (step.titleFr || translateLine(step.titleEn)) : step.titleEn,
+      };
+    }
+
+    function extractCodes(line) {
+      const codes = new Set();
+      const patterns = [
+        /\(([A-Z]?\d{4}[A-Z-]*|C\d{4}|xxxx)\)/gi,
+        /\[([A-Z]?\d{4}[A-Z-]*|C\d{4}|xxxx)\]/gi,
+      ];
+      patterns.forEach(pattern => {
+        for (const match of line.matchAll(pattern)) codes.add(match[1].toUpperCase());
+      });
+      return [...codes];
+    }
+
+    function renderList(items) {
+      if (!items || !items.length) return `<span class="empty">${txt("noItems")}</span>`;
+      return `<ul>${items.map(item => `<li>${renderLine(item)}</li>`).join("")}</ul>`;
+    }
+
+    function renderLine(line) {
+      const translated = escapeHtml(translateLine(line));
+      const chips = extractCodes(line).map(code => {
+        const item = catalogByCode.get(code);
+        if (!item) return `<span class="chip" title="${txt("bomNone")}">${escapeHtml(code)}</span>`;
+        const klass = item.source.includes("assembly") ? "chip assembly" : "chip";
+        return `<span class="${klass}" title="${escapeHtml(item.name)}">${escapeHtml(code)}</span>`;
+      }).join("");
+      return `${translated}${chips}`;
+    }
+
+    function searchable(step) {
+      const loc = localStep(step);
+      return [
+        loc.phase,
+        step.step,
+        loc.title,
+        step.source,
+        ...step.components,
+        ...step.hardware,
+        ...step.consumables,
+        ...step.instructions,
+      ].join(" ").toLowerCase();
+    }
+
+    function render() {
+      renderChrome();
+      renderStats();
+      renderTable();
+      renderSummary();
+      renderCatalog();
+      saveState();
+    }
+
+    function renderChrome() {
+      document.documentElement.lang = state.lang;
+      document.getElementById("appTitle").textContent = txt("appTitle");
+      document.getElementById("appSubtitle").textContent = txt("appSubtitle");
+      document.getElementById("search").placeholder = txt("search");
+      document.getElementById("catalogSearch").placeholder = txt("catalogSearch");
+      document.getElementById("langToggle").textContent = txt("langToggle");
+      document.getElementById("addStep").textContent = txt("addStep");
+      document.getElementById("openDiagrams").textContent = txt("openDiagrams");
+      document.getElementById("showDeleted").textContent = showDeleted ? txt("hideDeleted") : txt("showDeleted");
+      document.getElementById("exportJson").textContent = txt("exportJson");
+      document.getElementById("exportPortable").textContent = txt("exportPortable");
+      document.getElementById("resetData").textContent = txt("resetData");
+      document.getElementById("summaryTitle").textContent = txt("activeSummary");
+      document.getElementById("catalogTitle").textContent = txt("catalogTitle");
+      document.querySelectorAll("[data-i18n]").forEach(el => el.textContent = txt(el.dataset.i18n));
+      document.getElementById("cancelModal").textContent = txt("cancel");
+      document.querySelector("#stepForm .primary").textContent = txt("save");
+    }
+
+    function renderStats() {
+      const active = state.steps.filter(s => !s.deleted);
+      const deleted = state.steps.length - active.length;
+      const comp = active.reduce((sum, step) => sum + step.components.length, 0);
+      const hard = active.reduce((sum, step) => sum + step.hardware.length, 0);
+      document.getElementById("stats").innerHTML = [
+        [active.length, txt("activeSteps")],
+        [deleted, txt("deletedSteps")],
+        [comp, txt("componentsCount")],
+        [hard, txt("hardwareCount")],
+      ].map(([value, label]) => `<div class="stat"><strong>${value}</strong><span>${label}</span></div>`).join("");
+    }
+
+    function renderTable() {
+      const query = document.getElementById("search").value.trim().toLowerCase();
+      const rows = state.steps.filter(step => {
+        if (!showDeleted && step.deleted) return false;
+        if (!query) return true;
+        return searchable(step).includes(query);
+      });
+      const body = document.getElementById("stepsBody");
+      if (!rows.length) {
+        body.innerHTML = `<tr><td colspan="7" class="empty">${txt("noResults")}</td></tr>`;
+        return;
+      }
+      body.innerHTML = rows.map(step => {
+        const loc = localStep(step);
+        const action = step.deleted
+          ? `<button data-action="restore" data-id="${step.id}">${txt("restore")}</button>`
+          : `<button data-action="remove" data-id="${step.id}" class="danger">${txt("remove")}</button>`;
+        return `<tr class="${step.deleted ? "deleted" : ""}">
+          <td class="phase">${escapeHtml(loc.phase)}</td>
+          <td class="step-title"><strong>${escapeHtml(step.step)} - ${escapeHtml(loc.title)}</strong><span class="source">${txt("source")}: ${escapeHtml(step.source)}</span></td>
+          <td>${renderList(step.components)}</td>
+          <td>${renderList(step.hardware)}</td>
+          <td>${renderList(step.consumables)}</td>
+          <td>${renderList(step.instructions)}</td>
+          <td><div class="actions"><button data-action="edit" data-id="${step.id}">${txt("edit")}</button>${action}</div></td>
+        </tr>`;
+      }).join("");
+    }
+
+    function renderSummary() {
+      const active = state.steps.filter(s => !s.deleted);
+      const counts = new Map();
+      active.flatMap(s => [...s.components, ...s.hardware]).forEach(line => {
+        const normalized = line.replace(/\s+/g, " ").trim();
+        counts.set(normalized, (counts.get(normalized) || 0) + 1);
+      });
+      const top = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 80);
+      document.getElementById("summary").innerHTML = top.length
+        ? `<ul>${top.map(([line, count]) => `<li>${renderLine(line)}${count > 1 ? ` <span class="chip">x${count} lines</span>` : ""}</li>`).join("")}</ul>`
+        : `<span class="empty">${txt("noItems")}</span>`;
+    }
+
+    function renderCatalog() {
+      const query = document.getElementById("catalogSearch").value.trim().toLowerCase();
+      const list = BOM_CATALOG.filter(item => {
+        if (!query) return true;
+        return `${item.code} ${item.name} ${item.ref} ${item.vendor} ${item.source}`.toLowerCase().includes(query);
+      }).slice(0, 120);
+      document.getElementById("catalog").innerHTML = list.map(item => `
+        <div class="catalog-item">
+          <strong>${escapeHtml(item.code || "—")} · ${escapeHtml(item.name || "—")}</strong>
+          <span>${escapeHtml(item.source)}${item.ref ? ` · ${escapeHtml(item.ref)}` : ""}${item.vendor ? ` · ${escapeHtml(item.vendor)}` : ""}</span>
+        </div>`).join("");
+    }
+
+    function openModal(step) {
+      editingId = step ? step.id : null;
+      document.getElementById("modalTitle").textContent = step ? txt("modalEdit") : txt("modalAdd");
+      const form = document.getElementById("stepForm");
+      const data = step || {
+        phaseEn: "",
+        phaseFr: "",
+        step: "",
+        source: "Manual",
+        titleEn: "",
+        titleFr: "",
+        components: [],
+        hardware: [],
+        consumables: [],
+        instructions: [],
+      };
+      for (const name of ["phaseEn", "phaseFr", "step", "source", "titleEn", "titleFr"]) form.elements[name].value = data[name] || "";
+      for (const name of ["components", "hardware", "consumables", "instructions"]) form.elements[name].value = (data[name] || []).join("\n");
+      document.getElementById("modalBackdrop").classList.add("open");
+    }
+
+    function closeModal() {
+      document.getElementById("modalBackdrop").classList.remove("open");
+      editingId = null;
+    }
+
+    function lines(value) {
+      return value.split(/\n+/).map(v => v.trim()).filter(Boolean);
+    }
+
+    document.getElementById("langToggle").addEventListener("click", () => {
+      state.lang = state.lang === "en" ? "fr" : "en";
+      render();
+    });
+    document.getElementById("search").addEventListener("input", renderTable);
+    document.getElementById("catalogSearch").addEventListener("input", renderCatalog);
+    document.getElementById("showDeleted").addEventListener("click", () => {
+      showDeleted = !showDeleted;
+      render();
+    });
+    document.getElementById("addStep").addEventListener("click", () => openModal(null));
+    document.getElementById("openDiagrams").addEventListener("click", () => {
+      window.location.href = "diagram_pages/index.html";
+    });
+    document.getElementById("resetData").addEventListener("click", () => {
+      if (!confirm(txt("resetConfirm"))) return;
+      localStorage.removeItem(STORAGE_KEY);
+      state = { lang: state.lang, steps: structuredClone(INITIAL_STEPS) };
+      render();
+    });
+    document.getElementById("exportJson").addEventListener("click", async () => {
+      const json = JSON.stringify(state.steps.filter(step => !step.deleted), null, 2);
+      try {
+        await navigator.clipboard.writeText(json);
+        alert(txt("copied"));
+      } catch (error) {
+        const blob = new Blob([json], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "armadillo-supercycle-steps.json";
+        link.click();
+        URL.revokeObjectURL(url);
+      }
+    });
+    document.getElementById("exportPortable").addEventListener("click", () => {
+      const diagrams = {};
+      for (let index = 0; index < localStorage.length; index += 1) {
+        const key = localStorage.key(index);
+        if (!key || !key.startsWith("armadillo-diagram-hidden-")) continue;
+        try {
+          diagrams[key.replace("armadillo-diagram-hidden-", "")] = JSON.parse(localStorage.getItem(key) || "[]");
+        } catch (error) {}
+      }
+      const portable = {
+        tableSteps: state.steps,
+        diagrams,
+        exportedAt: new Date().toISOString(),
+      };
+      const js = `window.ARMADILLO_PORTABLE_STATE = ${JSON.stringify(portable, null, 2)};\n`;
+      const blob = new Blob([js], { type: "text/javascript" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "armadillo_portable_state.js";
+      link.click();
+      URL.revokeObjectURL(url);
+      alert(txt("portableSaved"));
+    });
+    document.getElementById("stepsBody").addEventListener("click", event => {
+      const button = event.target.closest("button[data-action]");
+      if (!button) return;
+      const step = state.steps.find(item => item.id === button.dataset.id);
+      if (!step) return;
+      if (button.dataset.action === "edit") openModal(step);
+      if (button.dataset.action === "remove") {
+        step.deleted = true;
+        render();
+      }
+      if (button.dataset.action === "restore") {
+        step.deleted = false;
+        render();
+      }
+    });
+    document.getElementById("cancelModal").addEventListener("click", closeModal);
+    document.getElementById("modalBackdrop").addEventListener("click", event => {
+      if (event.target.id === "modalBackdrop") closeModal();
+    });
+    document.getElementById("stepForm").addEventListener("submit", event => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const payload = {
+        id: editingId || `manual-${Date.now()}`,
+        phaseEn: form.elements.phaseEn.value.trim(),
+        phaseFr: form.elements.phaseFr.value.trim(),
+        step: form.elements.step.value.trim() || "Step",
+        titleEn: form.elements.titleEn.value.trim(),
+        titleFr: form.elements.titleFr.value.trim(),
+        source: form.elements.source.value.trim() || "Manual",
+        components: lines(form.elements.components.value),
+        hardware: lines(form.elements.hardware.value),
+        consumables: lines(form.elements.consumables.value),
+        instructions: lines(form.elements.instructions.value),
+      };
+      if (editingId) {
+        const index = state.steps.findIndex(step => step.id === editingId);
+        state.steps[index] = { ...state.steps[index], ...payload };
+      } else {
+        state.steps.push(payload);
+      }
+      closeModal();
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>

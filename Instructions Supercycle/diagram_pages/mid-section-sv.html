@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mid Section · Armadillo</title>
+  <style>
+:root {
+  --bg: #f5f7f8;
+  --panel: #ffffff;
+  --ink: #1d2428;
+  --muted: #63737b;
+  --line: #d7e0e4;
+  --accent: #1d7f74;
+  --danger: #b83232;
+  --blue: #245a8d;
+  --shadow: 0 12px 30px rgba(21, 32, 38, 0.08);
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(245, 247, 248, 0.94);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(10px);
+}
+.wrap { max-width: 1800px; margin: 0 auto; padding: 14px 20px; }
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+h1 { margin: 0; font-size: 22px; letter-spacing: 0; }
+.sub { margin: 3px 0 0; color: var(--muted); font-size: 13px; }
+.nav { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+a, button {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  border-radius: 6px;
+  padding: 8px 11px;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+a:hover, button:hover { border-color: #aab7bd; }
+.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.danger { color: var(--danger); }
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 16px;
+  align-items: start;
+}
+.viewer {
+  min-height: calc(100vh - 116px);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  position: relative;
+}
+.svg-stage {
+  width: 100%;
+  height: calc(100vh - 132px);
+  overflow: auto;
+  background: #ffffff;
+}
+.svg-stage object {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.fallback {
+  padding: 20px;
+  color: var(--muted);
+}
+aside {
+  position: sticky;
+  top: 84px;
+  display: grid;
+  gap: 12px;
+}
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 13px;
+  box-shadow: var(--shadow);
+}
+.panel h2 { margin: 0 0 10px; font-size: 16px; }
+.controls { display: grid; gap: 8px; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; }
+.status { color: var(--muted); font-size: 13px; }
+.list { max-height: 45vh; overflow: auto; border-top: 1px solid var(--line); margin-top: 10px; padding-top: 8px; }
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 0;
+  border-bottom: 1px solid #eef1f2;
+  font-size: 13px;
+}
+.item code { color: var(--blue); }
+.empty { color: var(--muted); font-style: italic; }
+@media (max-width: 1100px) {
+  .grid { grid-template-columns: 1fr; }
+  aside { position: static; }
+  .svg-stage { height: 72vh; }
+}
+@media (max-width: 720px) {
+  .wrap { padding: 12px; }
+  .topbar { display: block; }
+  .nav { justify-content: flex-start; margin-top: 10px; }
+}
+</style>
+</head>
+<body data-diagram-id="mid-section-sv">
+  <header>
+    <div class="wrap topbar">
+      <div>
+        <h1>Mid Section</h1>
+        <p class="sub">Clique sur une pièce pour la supprimer du schéma. Les suppressions restent sauvegardées après rechargement.</p>
+      </div>
+      <nav class="nav">
+        <a href="../supercycle_armadillo_table.html">Table étapes</a>
+        <a href="index.html">Index schémas</a>
+        <a href="front-section-sv.html">Front Section</a>
+<a href="mid-section-sv.html">Mid Section</a>
+<a href="rear-section-sv.html">Rear Section</a>
+<a href="steering-assembly-sv.html">Steering Assembly</a>
+<a href="velove-armadillo-overview-sv.html">Velove Armadillo Overview</a>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap grid">
+    <section class="viewer">
+      <div class="svg-stage">
+        <object id="svgObject" type="image/svg+xml" data="../planarmadillo/Mid-section%20sv.svg">
+          <div class="fallback">Schéma SVG indisponible.</div>
+        </object>
+      </div>
+    </section>
+    <aside>
+      <section class="panel">
+        <h2>Contrôles</h2>
+        <div class="controls">
+          <button id="toggleMode" class="primary">Mode suppression actif</button>
+          <button id="restoreAll" class="danger">Tout restaurer</button>
+          <button id="exportPortable">Sauvegarde portable</button>
+          <div id="statusLine" class="status"></div>
+        </div>
+      </section>
+      <section class="panel">
+        <h2>Pièces supprimées</h2>
+        <div id="removedList" class="list"></div>
+      </section>
+    </aside>
+  </main>
+  <script src="../armadillo_portable_state.js"></script>
+  <script>
+const diagramId = document.body.dataset.diagramId;
+const storageKey = `armadillo-diagram-hidden-${diagramId}`;
+const stage = document.querySelector(".svg-stage");
+const svgObject = document.getElementById("svgObject");
+const removedList = document.getElementById("removedList");
+const statusLine = document.getElementById("statusLine");
+let deleteMode = true;
+const localHiddenRaw = localStorage.getItem(storageKey);
+const portableHidden = window.ARMADILLO_PORTABLE_STATE?.diagrams?.[diagramId] || [];
+let hidden = new Set(localHiddenRaw ? JSON.parse(localHiddenRaw) : portableHidden);
+let svgDoc = null;
+let svg = null;
+
+function save() {
+  localStorage.setItem(storageKey, JSON.stringify([...hidden]));
+}
+
+function actorLabel(actor) {
+  const id = actor?.id || "";
+  const hint = findNearestHotspotLabel(actor);
+  return hint ? `${id} · ${hint}` : id;
+}
+
+function hotspotLabel(hotspot) {
+  const attr = hotspot?.getAttribute("onmousemove") || "";
+  const match = attr.match(/ShowToolTip\([^,]+,[^,]+,&quot;([^&]*)&quot;\)|ShowToolTip\([^,]+,[^,]+,"([^"]*)"\)/);
+  return match ? (match[1] || match[2] || "").trim() : "";
+}
+
+function findNearestHotspotLabel(actor) {
+  if (!actor || !actor.getBBox) return "";
+  let actorBox;
+  try { actorBox = actor.getBBox(); } catch { return ""; }
+  const ax = actorBox.x + actorBox.width / 2;
+  const ay = actorBox.y + actorBox.height / 2;
+  let best = { distance: Infinity, label: "" };
+  svg.querySelectorAll('[id^="hotspot."]').forEach(hotspot => {
+    const label = hotspotLabel(hotspot);
+    if (!label || !hotspot.getBBox) return;
+    try {
+      const box = hotspot.getBBox();
+      const hx = box.x + box.width / 2;
+      const hy = box.y + box.height / 2;
+      const distance = Math.hypot(ax - hx, ay - hy);
+      if (distance < best.distance) best = { distance, label };
+    } catch {}
+  });
+  return best.distance < 30 ? best.label : "";
+}
+
+function applyHidden() {
+  if (!svg) return;
+  svg.querySelectorAll('[id^="Actor_"]').forEach(actor => {
+    actor.classList.toggle("removed-piece", hidden.has(actor.id));
+  });
+  svg.querySelectorAll('[id^="hotspot."]').forEach(hotspot => {
+    const linked = hotspot.dataset.linkedActor;
+    hotspot.classList.toggle("removed-piece", Boolean(linked && hidden.has(linked)));
+  });
+  renderRemoved();
+}
+
+function renderRemoved() {
+  if (!svgDoc || !svg) {
+    statusLine.textContent = "Chargement du schéma...";
+    removedList.innerHTML = '<div class="empty">Chargement.</div>';
+    return;
+  }
+  const actors = [...hidden].map(id => svgDoc.getElementById(id)).filter(Boolean);
+  statusLine.textContent = `${hidden.size} pièce(s) supprimée(s) sur ${svg.querySelectorAll('[id^="Actor_"]').length}`;
+  if (!actors.length) {
+    removedList.innerHTML = '<div class="empty">Aucune pièce supprimée.</div>';
+    return;
+  }
+  removedList.innerHTML = actors.map(actor => `
+    <div class="item">
+      <span><code>${actor.id}</code>${actorLabel(actor).replace(actor.id, "")}</span>
+      <button data-restore="${actor.id}">Restaurer</button>
+    </div>
+  `).join("");
+}
+
+function actorFromPoint(event) {
+  const targetActor = event.target.closest?.('[id^="Actor_"]');
+  if (targetActor) return targetActor;
+
+  const hotspots = [...svg.querySelectorAll('[id^="hotspot."]')];
+  const previous = hotspots.map(node => node.style.pointerEvents);
+  hotspots.forEach(node => { node.style.pointerEvents = "none"; });
+  const under = svgDoc.elementFromPoint(event.clientX, event.clientY);
+  hotspots.forEach((node, index) => { node.style.pointerEvents = previous[index]; });
+  return under?.closest?.('[id^="Actor_"]') || null;
+}
+
+function linkHotspotsToActors() {
+  const hotspots = [...svg.querySelectorAll('[id^="hotspot."]')];
+  const previous = hotspots.map(node => node.style.pointerEvents);
+  hotspots.forEach(node => { node.style.pointerEvents = "none"; });
+  hotspots.forEach(hotspot => {
+    try {
+      const box = hotspot.getBoundingClientRect();
+      const points = [
+        [box.left + box.width / 2, box.top + box.height / 2],
+        [box.left + box.width * 0.35, box.top + box.height * 0.35],
+        [box.left + box.width * 0.65, box.top + box.height * 0.65],
+        [box.left + box.width * 0.35, box.top + box.height * 0.65],
+        [box.left + box.width * 0.65, box.top + box.height * 0.35],
+      ];
+      for (const [x, y] of points) {
+        const actor = svgDoc.elementFromPoint(x, y)?.closest?.('[id^="Actor_"]');
+        if (actor) {
+          hotspot.dataset.linkedActor = actor.id;
+          break;
+        }
+      }
+    } catch {}
+  });
+  hotspots.forEach((node, index) => { node.style.pointerEvents = previous[index]; });
+}
+
+function injectSvgControls() {
+  const style = svgDoc.createElementNS("http://www.w3.org/2000/svg", "style");
+  style.textContent = `
+    [id^="Actor_"] { cursor: pointer; transition: opacity 120ms ease, filter 120ms ease; }
+    [id^="Actor_"]:hover { filter: drop-shadow(0 0 1.3px rgba(29, 127, 116, 0.9)); }
+    .removed-piece { display: none !important; }
+  `;
+  svg.appendChild(style);
+}
+
+function onSvgClick(event) {
+  if (!deleteMode) return;
+  const clickedHotspot = event.target.closest?.('[id^="hotspot."]');
+  const actor = actorFromPoint(event);
+  if (!actor) return;
+  if (clickedHotspot) clickedHotspot.dataset.linkedActor = actor.id;
+  hidden.add(actor.id);
+  save();
+  applyHidden();
+  event.preventDefault();
+  event.stopPropagation();
+}
+
+document.getElementById("toggleMode").addEventListener("click", event => {
+  deleteMode = !deleteMode;
+  stage.classList.toggle("delete-mode", deleteMode);
+  event.currentTarget.textContent = deleteMode ? "Mode suppression actif" : "Mode inspection";
+});
+
+document.getElementById("restoreAll").addEventListener("click", () => {
+  hidden.clear();
+  save();
+  applyHidden();
+});
+
+document.getElementById("exportPortable").addEventListener("click", () => {
+  const diagrams = { ...(window.ARMADILLO_PORTABLE_STATE?.diagrams || {}) };
+  for (let index = 0; index < localStorage.length; index += 1) {
+    const key = localStorage.key(index);
+    if (!key || !key.startsWith("armadillo-diagram-hidden-")) continue;
+    try {
+      diagrams[key.replace("armadillo-diagram-hidden-", "")] = JSON.parse(localStorage.getItem(key) || "[]");
+    } catch (error) {}
+  }
+  diagrams[diagramId] = [...hidden];
+  let tableSteps = window.ARMADILLO_PORTABLE_STATE?.tableSteps || null;
+  try {
+    const tableRaw = localStorage.getItem("armadillo-supercycle-table-v1");
+    if (tableRaw) tableSteps = JSON.parse(tableRaw).steps;
+  } catch (error) {}
+  const portable = { tableSteps, diagrams, exportedAt: new Date().toISOString() };
+  const js = `window.ARMADILLO_PORTABLE_STATE = ${JSON.stringify(portable, null, 2)};\n`;
+  const blob = new Blob([js], { type: "text/javascript" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "armadillo_portable_state.js";
+  link.click();
+  URL.revokeObjectURL(url);
+  alert("Sauvegarde portable téléchargée. Remplace armadillo_portable_state.js dans le dossier avant de l'envoyer.");
+});
+
+removedList.addEventListener("click", event => {
+  const button = event.target.closest("button[data-restore]");
+  if (!button) return;
+  hidden.delete(button.dataset.restore);
+  save();
+  applyHidden();
+});
+
+function initSvg() {
+  svgDoc = svgObject.contentDocument;
+  svg = svgDoc?.documentElement || null;
+  if (!svgDoc || !svg) {
+    statusLine.textContent = "Impossible d'accéder au SVG depuis cette page.";
+    removedList.innerHTML = '<div class="empty">Ouvre cette page depuis le même dossier que les SVG.</div>';
+    return;
+  }
+  injectSvgControls();
+  svgDoc.addEventListener("click", onSvgClick, true);
+  linkHotspotsToActors();
+  applyHidden();
+}
+
+stage.classList.add("delete-mode");
+renderRemoved();
+svgObject.addEventListener("load", initSvg);
+</script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Schémas éclatés Armadillo</title>
+  <style>
+    
+:root {
+  --bg: #f5f7f8;
+  --panel: #ffffff;
+  --ink: #1d2428;
+  --muted: #63737b;
+  --line: #d7e0e4;
+  --accent: #1d7f74;
+  --danger: #b83232;
+  --blue: #245a8d;
+  --shadow: 0 12px 30px rgba(21, 32, 38, 0.08);
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(245, 247, 248, 0.94);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(10px);
+}
+.wrap { max-width: 1800px; margin: 0 auto; padding: 14px 20px; }
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+h1 { margin: 0; font-size: 22px; letter-spacing: 0; }
+.sub { margin: 3px 0 0; color: var(--muted); font-size: 13px; }
+.nav { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+a, button {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  border-radius: 6px;
+  padding: 8px 11px;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+a:hover, button:hover { border-color: #aab7bd; }
+.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.danger { color: var(--danger); }
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 16px;
+  align-items: start;
+}
+.viewer {
+  min-height: calc(100vh - 116px);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  position: relative;
+}
+.svg-stage {
+  width: 100%;
+  height: calc(100vh - 132px);
+  overflow: auto;
+  background: #ffffff;
+}
+.svg-stage object {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.fallback {
+  padding: 20px;
+  color: var(--muted);
+}
+aside {
+  position: sticky;
+  top: 84px;
+  display: grid;
+  gap: 12px;
+}
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 13px;
+  box-shadow: var(--shadow);
+}
+.panel h2 { margin: 0 0 10px; font-size: 16px; }
+.controls { display: grid; gap: 8px; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; }
+.status { color: var(--muted); font-size: 13px; }
+.list { max-height: 45vh; overflow: auto; border-top: 1px solid var(--line); margin-top: 10px; padding-top: 8px; }
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 0;
+  border-bottom: 1px solid #eef1f2;
+  font-size: 13px;
+}
+.item code { color: var(--blue); }
+.empty { color: var(--muted); font-style: italic; }
+@media (max-width: 1100px) {
+  .grid { grid-template-columns: 1fr; }
+  aside { position: static; }
+  .svg-stage { height: 72vh; }
+}
+@media (max-width: 720px) {
+  .wrap { padding: 12px; }
+  .topbar { display: block; }
+  .nav { justify-content: flex-start; margin-top: 10px; }
+}
+
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+    .diagram-card { display: grid; gap: 4px; padding: 16px; min-height: 94px; align-content: center; box-shadow: var(--shadow); }
+    .diagram-card strong { font-size: 17px; }
+    .diagram-card span { color: var(--muted); font-size: 13px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap topbar">
+      <div>
+        <h1>Schémas éclatés Armadillo</h1>
+        <p class="sub">Pages HTML générées depuis les SVG interactifs. Chaque page garde ses suppressions localement.</p>
+      </div>
+      <nav class="nav"><a href="../supercycle_armadillo_table.html">Table étapes</a></nav>
+    </div>
+  </header>
+  <main class="wrap">
+    <section class="cards">
+      <a class="diagram-card" href="front-section-sv.html"><strong>Front Section</strong><span>Front-section sv.svg</span></a>
+<a class="diagram-card" href="mid-section-sv.html"><strong>Mid Section</strong><span>Mid-section sv.svg</span></a>
+<a class="diagram-card" href="rear-section-sv.html"><strong>Rear Section</strong><span>Rear section sv.svg</span></a>
+<a class="diagram-card" href="steering-assembly-sv.html"><strong>Steering Assembly</strong><span>Steering assembly sv.svg</span></a>
+<a class="diagram-card" href="velove-armadillo-overview-sv.html"><strong>Velove Armadillo Overview</strong><span>Velove Armadillo Overview sv.svg</span></a>
+    </section>
+  </main>
+</body>
+</html>
